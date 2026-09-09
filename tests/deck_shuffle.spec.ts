@@ -3,9 +3,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Feature: Trộn Thẻ Ngẫu Nhiên và Bốc Từ Tức Thì (Deck Shuffle & Random Card)', () => {
 
 	test('Scenario: Người dùng nhấn nút Trộn thẻ hoặc phím S để xáo trộn bộ thẻ và khôi phục thứ tự gốc', async ({ page }) => {
-		// Given: Người dùng truy cập trang chủ FLCard-JP
-		await test.step('Given: Người dùng truy cập trang chủ FLCard-JP', async () => {
-			await page.goto('/');
+		// Given: Người dùng truy cập phòng học FLCard-JP
+		await test.step('Given: Người dùng truy cập phòng học FLCard-JP', async () => {
+			await page.goto('/study');
 			await page.waitForLoadState('domcontentloaded');
 		});
 
@@ -56,9 +56,9 @@ test.describe('Feature: Trộn Thẻ Ngẫu Nhiên và Bốc Từ Tức Thì (De
 	});
 
 	test('Scenario: Người dùng nhấn phím R để nhảy ngẫu nhiên đến một thẻ trong bộ học', async ({ page }) => {
-		// Given: Người dùng đang ở trang chủ FLCard-JP
-		await test.step('Given: Người dùng truy cập trang chủ và kiểm tra thẻ hiện tại', async () => {
-			await page.goto('/');
+		// Given: Người dùng đang ở phòng học FLCard-JP
+		await test.step('Given: Người dùng truy cập phòng học và kiểm tra thẻ hiện tại', async () => {
+			await page.goto('/study');
 			await page.waitForLoadState('domcontentloaded');
 		});
 

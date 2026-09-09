@@ -80,9 +80,9 @@ test.describe('Feature: Nhập Thẻ Hàng Loạt Bằng JSON Và Ghép Ảnh (B
 	});
 
 	test('Scenario: Nhập JSON chuẩn và chuyển sang Bước 2 Studio Ghép Ảnh rồi nạp vào bộ học', async ({ page }) => {
-		// Given: Người dùng nhập JSON chuẩn chứa 2 từ mới
+		// Given: Người dùng nhập JSON chuẩn chứa 2 từ mới trong phòng học
 		await test.step('Given: Người dùng dán JSON chuẩn gồm 2 từ vựng N5', async () => {
-			await page.goto('/');
+			await page.goto('/study');
 			await page.waitForLoadState('domcontentloaded');
 			await page.locator('#nav-batch-import-btn').click();
 
@@ -122,8 +122,9 @@ test.describe('Feature: Nhập Thẻ Hàng Loạt Bằng JSON Và Ghép Ảnh (B
 			await expect(stepBadge).toBeVisible();
 
 			// Thẻ 桜 và 富士山 phải hiển thị trong danh sách Studio
-			const sakuraCard = page.getByText('桜', { exact: true });
-			const fujiCard = page.getByText('富士山', { exact: true });
+			const modal = page.getByRole('dialog');
+			const sakuraCard = modal.getByText('桜', { exact: true });
+			const fujiCard = modal.getByText('富士山', { exact: true });
 			await expect(sakuraCard).toBeVisible();
 			await expect(fujiCard).toBeVisible();
 

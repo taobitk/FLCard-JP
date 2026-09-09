@@ -113,13 +113,13 @@ test.describe('Feature: Quản lý và Tự Tạo Thẻ Flashcard Thông Minh', 
 	});
 
 	test('Scenario: Người dùng mở danh sách thẻ để chỉnh sửa nội dung thẻ và xóa thẻ thành công', async ({ page }) => {
-		// Given: Người dùng mở trang chủ và bấm vào số thứ tự để mở danh sách thẻ
-		await test.step('Given: Người dùng truy cập trang chủ và mở Popup danh sách thẻ', async () => {
-			await page.goto('/');
+		// Given: Người dùng mở phòng học và bấm vào số thứ tự để mở danh sách thẻ
+		await test.step('Given: Người dùng truy cập phòng học và mở Popup danh sách thẻ', async () => {
+			await page.goto('/study');
 			await page.waitForLoadState('domcontentloaded');
 
-			// Bấm vào nút số thứ tự thẻ để mở DeckListModal
-			const deckListTrigger = page.locator('button[title*="danh sách toàn bộ thẻ"]');
+			// Bấm vào nút số thứ tự để mở modal
+			const deckListTrigger = page.locator('button[title*="Bấm để xem danh sách toàn bộ thẻ"]');
 			await expect(deckListTrigger).toBeVisible();
 			await deckListTrigger.click();
 

@@ -21,19 +21,34 @@
 }
 
 @layer base {
+  :root {
+    --canvas-bg: #f8f9fb;
+    --card-surface: #ffffff;
+    --card-surface-subtle: #f1f5f9;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --accent-indigo: #4f46e5;
+  }
+
+  html.dark {
+    --canvas-bg: #0b0f19;
+    --card-surface: #151c2c;
+    --card-surface-subtle: #1e293b;
+    --border-color: #242f47;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent-indigo: #6366f1;
+  }
+
   html {
     @apply h-full;
   }
 
   body {
-    @apply h-full overflow-hidden antialiased selection:bg-rose-500/30 selection:text-rose-600 dark:selection:text-rose-200 transition-colors duration-300;
+    @apply min-h-full antialiased selection:bg-indigo-500/20 selection:text-indigo-600 dark:selection:text-indigo-300 transition-colors duration-200;
     font-family: var(--font-sans);
-    /* Mặc định Light mode: Phong cách giấy Washi Nhật Bản ấm áp */
-    @apply bg-zinc-100 text-zinc-800;
-  }
-
-  /* Dark mode: Than chì sâu thẳm sang trọng */
-  html.dark body {
-    @apply bg-zinc-950 text-zinc-100;
+    background-color: var(--canvas-bg);
+    color: var(--text-primary);
   }
 }

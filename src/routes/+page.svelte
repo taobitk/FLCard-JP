@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type { FlashcardItem } from '$lib/features/flashcard/types';
 	import type { PageData } from './$types';
+	import type { FlashcardItem } from '$lib/features/flashcard/types';
 	import Navbar from '$lib/shared/components/Navbar.svelte';
-	import Flashcard from '$lib/features/flashcard/components/Flashcard.svelte';
 	import CreateCardModal from '$lib/features/deck-manager/components/CreateCardModal.svelte';
 	import DeckListModal from '$lib/features/deck-manager/components/DeckListModal.svelte';
 	import BatchImportModal from '$lib/features/deck-manager/components/BatchImportModal.svelte';
@@ -10,156 +9,15 @@
 	let { data }: { data: PageData } = $props();
 
 	let cards = $state<FlashcardItem[]>([]);
-
-	// Đồng bộ trực tiếp dữ liệu thẻ từ Cloudflare D1
 	$effect(() => {
 		cards = data?.cards ? [...data.cards] : [];
 	});
 
-	let currentIndex = $state(0);
-	let isFlipped = $state(false);
 	let isCreateModalOpen = $state(false);
 	let isDeckListModalOpen = $state(false);
 	let isBatchImportModalOpen = $state(false);
-	let isShuffled = $state(false);
-	let unshuffledCards: FlashcardItem[] = [];
 	let cardToEdit = $state<FlashcardItem | null>(null);
 	let notification = $state('');
-
-	let currentCard = $derived(cards[currentIndex] || cards[0]);
-
-	function toggleFlip() {
-		isFlipped = !isFlipped;
-	}
-
-	function nextCard() {
-		isFlipped = false;
-		currentIndex = (currentIndex + 1) % cards.length;
-	}
-
-	function prevCard() {
-		isFlipped = false;
-		currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-	}
-
-	function shuffleArray<T>(array: T[]): T[] {
-		const arr = [...array];
-		for (let i = arr.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[arr[i], arr[j]] = [arr[j], arr[i]];
-		}
-		return arr;
-	}
-
-	function toggleShuffle() {
-		if (cards.length <= 1) {
-			showNotification('⚠️ Cần ít nhất 2 thẻ để thực hiện xáo trộn!');
-			return;
-		}
-
-		if (!isShuffled) {
-			unshuffledCards = [...cards];
-			cards = shuffleArray(cards);
-			isShuffled = true;
-			currentIndex = 0;
-			isFlipped = false;
-			showNotification('🔀 Đã bật chế độ trộn ngẫu nhiên!');
-		} else {
-			if (unshuffledCards.length > 0) {
-				cards = [...unshuffledCards];
-			}
-			isShuffled = false;
-			currentIndex = 0;
-			isFlipped = false;
-			showNotification('↩️ Đã khôi phục thứ tự gốc!');
-		}
-	}
-
-	function jumpToRandomCard() {
-		if (cards.length <= 1) return;
-		let nextIdx = currentIndex;
-		while (nextIdx === currentIndex) {
-			nextIdx = Math.floor(Math.random() * cards.length);
-		}
-		currentIndex = nextIdx;
-		isFlipped = false;
-		showNotification(`🎲 Đã nhảy ngẫu nhiên đến thẻ #${currentIndex + 1}`);
-	}
-
-	function handleEditCard(card: FlashcardItem) {
-		cardToEdit = card;
-		isCreateModalOpen = true;
-	}
-
-	async function handleDeleteCard(index: number) {
-		const targetCard = cards[index];
-		if (!targetCard) return;
-
-		if (cards.length <= 1) {
-			showNotification('⚠️ Cần giữ lại ít nhất 1 thẻ trong bộ học!');
-			return;
-		}
-
-		cards = cards.filter((_, i) => i !== index);
-
-		if (currentIndex >= cards.length) {
-			currentIndex = cards.length - 1;
-		}
-		isFlipped = false;
-
-		// Đồng bộ xóa thẻ khỏi Cloudflare D1
-		try {
-			await fetch(`/api/cards?id=${encodeURIComponent(targetCard.id)}`, { method: 'DELETE' });
-		} catch (err) {
-			console.error('Lỗi khi xóa thẻ khỏi Cloudflare D1:', err);
-		}
-
-		showNotification(`🗑️ Đã xóa thẻ: "${targetCard.term}"!`);
-	}
-
-	async function handleSaveCard(savedCard: FlashcardItem) {
-		const isEdit = Boolean(cardToEdit);
-		if (cardToEdit) {
-			cards = cards.map(c => c.id === savedCard.id ? savedCard : c);
-			showNotification(`✏️ Đã cập nhật thành công thẻ: "${savedCard.term}"!`);
-			cardToEdit = null;
-		} else {
-			cards = [savedCard, ...cards];
-			currentIndex = 0; // Xem ngay thẻ vừa tạo
-			showNotification(`🎉 Đã thêm thành công thẻ: "${savedCard.term}"!`);
-		}
-		isFlipped = false;
-
-		// Đồng bộ lưu thẻ vào Cloudflare D1
-		try {
-			await fetch('/api/cards', {
-				method: isEdit ? 'PUT' : 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(savedCard)
-			});
-		} catch (err) {
-			console.error('Lỗi khi lưu thẻ vào Cloudflare D1:', err);
-		}
-	}
-
-	async function handleBatchImportCards(newCards: FlashcardItem[]) {
-		cards = [...newCards, ...cards];
-		currentIndex = 0; // Chuyển ngay về xem thẻ mới đầu tiên
-		isFlipped = false;
-
-		// Đồng bộ nạp hàng loạt thẻ vào Cloudflare D1
-		try {
-			await fetch('/api/cards/batch', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ cards: newCards })
-			});
-		} catch (err) {
-			console.error('Lỗi khi nạp hàng loạt thẻ vào Cloudflare D1:', err);
-		}
-
-		showNotification(`🚀 Đã nạp thành công ${newCards.length} thẻ mới vào bộ học!`);
-	}
 
 	function showNotification(msg: string) {
 		notification = msg;
@@ -168,76 +26,43 @@
 		}, 3000);
 	}
 
-	function handleRating(label: string) {
-		showNotification(`Đã đánh giá: ${label}!`);
-		setTimeout(() => {
-			nextCard();
-		}, 300);
-	}
-
-	function onKeydown(e: KeyboardEvent) {
-		// Không bắt phím tắt khi modal đang mở
-		if (isCreateModalOpen || isDeckListModalOpen || isBatchImportModalOpen) return;
-
-		if (e.code === 'Space') {
-			e.preventDefault();
-			toggleFlip();
-		} else if (e.code === 'ArrowRight') {
-			nextCard();
-		} else if (e.code === 'ArrowLeft') {
-			prevCard();
-		} else if (e.code === 'KeyS') {
-			e.preventDefault();
-			toggleShuffle();
-		} else if (e.code === 'KeyR') {
-			e.preventDefault();
-			jumpToRandomCard();
-		} else if (isFlipped) {
-			if (e.key === '1') handleRating('Again');
-			if (e.key === '2') handleRating('Hard');
-			if (e.key === '3') handleRating('Good');
-			if (e.key === '4') handleRating('Easy');
+	async function handleSaveCard(savedCard: FlashcardItem) {
+		cards = [savedCard, ...cards];
+		showNotification(`🎉 Đã thêm thành công thẻ: "${savedCard.term}"!`);
+		try {
+			await fetch('/api/cards', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(savedCard)
+			});
+		} catch (err) {
+			console.error('Lỗi khi lưu thẻ:', err);
 		}
 	}
 
-	// Xử lý vuốt màn hình cảm ứng mượt mà trên điện thoại (Mobile Touch Swipe)
-	let touchStartX = 0;
-	let touchStartY = 0;
-
-	function onTouchStart(e: TouchEvent) {
-		if (isCreateModalOpen || isDeckListModalOpen || isBatchImportModalOpen) return;
-		touchStartX = e.changedTouches[0].clientX;
-		touchStartY = e.changedTouches[0].clientY;
-	}
-
-	function onTouchEnd(e: TouchEvent) {
-		if (isCreateModalOpen || isDeckListModalOpen || isBatchImportModalOpen) return;
-		const touchEndX = e.changedTouches[0].clientX;
-		const touchEndY = e.changedTouches[0].clientY;
-		const diffX = touchEndX - touchStartX;
-		const diffY = touchEndY - touchStartY;
-
-		// Nhận diện vuốt ngang dứt khoát (> 40px)
-		if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
-			if (diffX < 0) {
-				nextCard(); // Vuốt sang trái -> Thẻ tiếp theo
-			} else {
-				prevCard(); // Vuốt sang phải -> Thẻ trước
-			}
+	async function handleBatchImportCards(newCards: FlashcardItem[]) {
+		cards = [...newCards, ...cards];
+		showNotification(`🚀 Đã nạp thành công ${newCards.length} thẻ mới vào bộ học!`);
+		try {
+			await fetch('/api/cards/batch', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ cards: newCards })
+			});
+		} catch (err) {
+			console.error('Lỗi khi nạp thẻ hàng loạt:', err);
 		}
 	}
 </script>
 
-<svelte:window 
-	onkeydown={onKeydown} 
-	ontouchstart={onTouchStart} 
-	ontouchend={onTouchEnd} 
-/>
+<svelte:head>
+	<title>FLCard-JP • Trung Tâm Học Tiếng Nhật Thông Minh</title>
+</svelte:head>
 
-<!-- GIAO DIỆN CHUẨN ZEN: ĐÚNG 1 TRANG DUY NHẤT (NO SCROLL, 100DVH CHO MOBILE) -->
-<div class="h-[100dvh] max-h-[100dvh] w-screen overflow-hidden flex flex-col justify-between pt-14 sm:pt-16 pb-safe bg-zinc-100 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 transition-colors duration-300 relative select-none touch-manipulation">
-	<!-- Ánh sáng nền tinh tế (Ambient Background) -->
-	<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] bg-gradient-to-b from-rose-500/10 via-amber-500/5 to-transparent blur-3xl pointer-events-none"></div>
+<!-- GIAO DIỆN LEARNING PORTAL HUB -->
+<div class="min-h-screen w-full bg-[#f8f9fb] dark:bg-[#0b0f19] text-slate-800 dark:text-slate-100 transition-colors duration-200 flex flex-col pt-16 sm:pt-20 pb-12 relative select-none">
+	<!-- Ambient Background Glow -->
+	<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-indigo-500/10 via-emerald-500/5 to-transparent blur-3xl pointer-events-none"></div>
 
 	<!-- Navbar Cố Định -->
 	<Navbar
@@ -245,156 +70,248 @@
 		onBatchImport={() => isBatchImportModalOpen = true}
 	/>
 
-	<!-- Toast thông báo nổi -->
+	<!-- Toast Thông Báo -->
 	{#if notification}
-		<div class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-semibold text-xs px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-2xl backdrop-blur-md border border-emerald-400/40 animate-in fade-in slide-in-from-bottom-3 duration-200">
+		<div class="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-2xl shadow-2xl backdrop-blur-md border border-emerald-400/40 animate-in fade-in slide-in-from-bottom-3 duration-200">
 			{notification}
 		</div>
 	{/if}
 
-	<!-- KHU VỰC TRUNG TÂM DUY NHẤT: THẺ HỌC FLASHCARD (Không cuộn, vừa khít màn hình điện thoại & máy tính) -->
-	<main class="flex-1 w-full max-w-lg mx-auto px-3 sm:px-4 py-1 sm:py-3 flex flex-col items-center justify-center relative z-10">
-		<!-- Thanh điều hướng thẻ tinh tế -->
-		<div class="w-full flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1.5 sm:mb-2.5 px-1 sm:px-2">
-			<button 
-				type="button"
-				class="px-3 py-1 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-rose-500 transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
-				onclick={prevCard}
-				title="Thẻ trước (Phím ←)"
-			>
-				<span>←</span>
-				<span class="hidden sm:inline">Trước</span>
-			</button>
+	<main class="w-full max-w-5xl mx-auto px-4 sm:px-6 relative z-10 flex flex-col gap-6 sm:gap-8">
+		<!-- HERO DASHBOARD BANNER -->
+		<section class="rounded-3xl p-5 sm:p-7 bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+			<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-gradient-to-br from-indigo-500/10 to-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-			<!-- Bấm vào số thứ tự để mở ngay Popup Danh Sách Thẻ -->
-			<div class="flex items-center gap-1.5 sm:gap-2">
-				<button
-					type="button"
-					class="font-mono text-xs px-3.5 py-1 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-rose-400 dark:hover:border-rose-500/60 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+			<div class="space-y-2">
+				<div class="flex items-center gap-2">
+					<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 level-pill">N5</span>
+					<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+						<span>🔥</span> Chuỗi học 7 ngày
+					</span>
+					<span class="text-xs text-slate-500 dark:text-slate-400">| Bộ thẻ hoạt động</span>
+				</div>
+				<h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+					Chào bạn! Hôm nay bạn có <span class="text-indigo-600 dark:text-indigo-400">{cards.length} thẻ</span> cần ôn.
+				</h1>
+				<p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+					Khám phá các phương pháp học tiếng Nhật đa giác quan: Luyện phản xạ Flashcard ngắt quãng, tra cứu Kanji chuyên sâu, luyện nói Shadowing và sáng tạo câu với AI.
+				</p>
+			</div>
+
+			<!-- CTA Tiếp tục ôn tập -->
+			<div class="flex-shrink-0 flex items-center gap-3">
+				<a
+					href="/study"
+					class="px-5 sm:px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 active:scale-95 transition-all flex items-center gap-2 group cursor-pointer"
+					title="Bắt đầu phòng ôn Flashcard tập trung"
+				>
+					<span>▶ Vào phòng ôn Flashcard</span>
+					<span class="group-hover:translate-x-1 transition-transform">→</span>
+				</a>
+			</div>
+		</section>
+
+		<!-- LEARNING MODULES GRID (CÁC PHÂN HỆ TÍNH NĂNG) -->
+		<section class="space-y-3 sm:space-y-4">
+			<div class="flex items-center justify-between">
+				<h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+					<span>🎌</span> Các Phân Hệ Học Tập & Luyện Tập
+				</h2>
+				<span class="text-xs text-slate-500 dark:text-slate-400">Chọn một phân hệ để bắt đầu</span>
+			</div>
+
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+				<!-- Module 1: Flashcard SRS -->
+				<a
+					href="/study"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] hover:bg-slate-50/80 dark:hover:bg-[#1a2337] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer relative overflow-hidden"
+				>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							🎴
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+							Luyện Flashcard (SRS)
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Ôn tập ngắt quãng SM-2, lật thẻ 3D hai mặt, hỗ trợ âm thanh Web Speech và phím tắt 1-4 một tay.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+						<span>{cards.length} thẻ sẵn sàng</span>
+						<span class="group-hover:translate-x-1 transition-transform">Học ngay →</span>
+					</div>
+				</a>
+
+				<!-- Module 2: Kanji Hub & Stroke Order -->
+				<div
+					role="button"
+					tabindex="0"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
+					onclick={() => showNotification('💡 Tra cứu nhanh Kanji đã được tích hợp sẵn trong form tạo thẻ!')}
+					onkeydown={(e) => e.key === 'Enter' && showNotification('💡 Tra cứu nhanh Kanji đã được tích hợp sẵn trong form tạo thẻ!')}
+				>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							✍️
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+							Luyện & Tra Cứu Kanji
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Tra từ điển Mazii, gợi ý Furigana chuẩn thẻ ruby, âm Hán Việt và phân tích bộ thủ trực quan.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-rose-600 dark:text-rose-400">
+						<span>Tích hợp 0ms</span>
+						<span class="group-hover:translate-x-1 transition-transform">Tra cứu →</span>
+					</div>
+				</div>
+
+				<!-- Module 3: Shadowing & Luyện Nói -->
+				<div
+					role="button"
+					tabindex="0"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
+					onclick={() => showNotification('🎙️ Tính năng Shadowing đa giọng AI đang được hoàn thiện!')}
+					onkeydown={(e) => e.key === 'Enter' && showNotification('🎙️ Tính năng Shadowing đa giọng AI đang được hoàn thiện!')}
+				>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							🎙️
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+							Shadowing & Luyện Phát Âm
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Nghe phát âm chuẩn ngữ điệu Tokyo (Kore, Aoede, Fenrir) và luyện phản xạ nói chuẩn xác.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400">
+						<span>Speech Lab</span>
+						<span class="group-hover:translate-x-1 transition-transform">Thử giọng →</span>
+					</div>
+				</div>
+
+				<!-- Module 4: Đặt câu AI -->
+				<div
+					role="button"
+					tabindex="0"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
+					onclick={() => showNotification('🤖 Tính năng Đặt câu AI ngữ cảnh qua Gemini Edge sẽ sớm ra mắt!')}
+					onkeydown={(e) => e.key === 'Enter' && showNotification('🤖 Tính năng Đặt câu AI ngữ cảnh qua Gemini Edge sẽ sớm ra mắt!')}
+				>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							🤖
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+							Đặt Câu Ngữ Cảnh AI
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Tạo câu ví dụ giao tiếp thực tế theo từng cấp độ JLPT từ N5 đến N1 bằng mô hình Gemini Flash.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400">
+						<span>Gemini Edge</span>
+						<span class="group-hover:translate-x-1 transition-transform">Tạo câu →</span>
+					</div>
+				</div>
+
+				<!-- Module 5: Quản lý bộ thẻ (Deck Library) -->
+				<div
+					role="button"
+					tabindex="0"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
 					onclick={() => isDeckListModalOpen = true}
-					title="Bấm để xem danh sách toàn bộ thẻ"
+					onkeydown={(e) => e.key === 'Enter' && (isDeckListModalOpen = true)}
 				>
-					<span class="text-rose-500 font-bold">{currentIndex + 1}</span>
-					<span class="text-zinc-400">/</span>
-					<span>{cards.length}</span>
-					<span class="text-[10px] text-zinc-400">▼</span>
-				</button>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							📚
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+							Kho Thẻ & Thư Viện
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Duyệt danh mục từ vựng, tìm kiếm nhanh theo Kanji/Romaji, chỉnh sửa thẻ và quản lý ảnh R2.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+						<span>Duyệt toàn bộ kho</span>
+						<span class="group-hover:translate-x-1 transition-transform">Mở kho →</span>
+					</div>
+				</div>
 
-				<!-- Nút Trộn Thẻ Ngẫu Nhiên (Shuffle Mode) -->
-				<button
-					type="button"
-					id="btn-shuffle-deck"
-					class="px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95 {isShuffled ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 ring-2 ring-amber-400/20 font-bold' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-amber-500'}"
-					onclick={toggleShuffle}
-					title={isShuffled ? 'Đang bật trộn ngẫu nhiên. Bấm để khôi phục thứ tự gốc (Phím S)' : 'Trộn ngẫu nhiên thứ tự các thẻ (Phím S)'}
+				<!-- Module 6: Thống kê & Tiến độ -->
+				<div
+					role="button"
+					tabindex="0"
+					class="group p-5 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
+					onclick={() => showNotification(`📊 Tổng cộng: ${cards.length} thẻ trong cơ sở dữ liệu Cloudflare D1.`)}
+					onkeydown={(e) => e.key === 'Enter' && showNotification(`📊 Tổng cộng: ${cards.length} thẻ trong cơ sở dữ liệu Cloudflare D1.`)}
 				>
-					<span class="text-xs leading-none">🔀</span>
-					<span class="hidden sm:inline">{isShuffled ? 'Đang trộn' : 'Trộn'}</span>
-				</button>
-			</div>
-
-			<button 
-				type="button"
-				class="px-3 py-1 rounded-xl bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-rose-500 transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
-				onclick={nextCard}
-				title="Thẻ tiếp theo (Phím →)"
-			>
-				<span class="hidden sm:inline">Tiếp</span>
-				<span>→</span>
-			</button>
-		</div>
-
-		<!-- Chiếc Thẻ 3D Hoàn Chỉnh -->
-		{#if currentCard}
-			<div class="w-full">
-				<Flashcard
-					card={currentCard}
-					{isFlipped}
-					onFlip={toggleFlip}
-				/>
-			</div>
-		{:else}
-			<div class="w-full py-10 sm:py-14 flex flex-col items-center justify-center text-center p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-sm space-y-3 animate-in fade-in">
-				<div class="text-4xl">📭</div>
-				<h3 class="text-base font-bold text-zinc-900 dark:text-white">Bộ thẻ hiện đang trống</h3>
-				<p class="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">Hãy bấm "+ Tạo thẻ mới" hoặc "Nhập thẻ hàng loạt" trên thanh menu để nạp từ vựng vào học nhé!</p>
-			</div>
-		{/if}
-
-		<!-- Thanh Nút Đánh Giá SRS Khi Lật Thẻ -->
-		<div class="w-full mt-2 sm:mt-4">
-			{#if isFlipped}
-				<div class="grid grid-cols-4 gap-1.5 sm:gap-2 animate-in fade-in slide-in-from-top-2 duration-150">
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-red-500/10 dark:bg-red-500/15 hover:bg-red-500/20 border border-red-500/30 text-red-600 dark:text-red-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Again')}
-					>
-						<span class="text-[11px] sm:text-xs">1. Quên</span>
-						<span class="text-[9px] sm:text-[10px] text-red-400/80 font-normal mt-0.5">&lt; 10m</span>
-					</button>
-
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 hover:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Hard')}
-					>
-						<span class="text-[11px] sm:text-xs">2. Khó</span>
-						<span class="text-[9px] sm:text-[10px] text-amber-400/80 font-normal mt-0.5">1 ngày</span>
-					</button>
-
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Good')}
-					>
-						<span class="text-[11px] sm:text-xs">3. Thuộc</span>
-						<span class="text-[9px] sm:text-[10px] text-blue-400/80 font-normal mt-0.5">3 ngày</span>
-					</button>
-
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Easy')}
-					>
-						<span class="text-[11px] sm:text-xs">4. Dễ</span>
-						<span class="text-[9px] sm:text-[10px] text-emerald-400/80 font-normal mt-0.5">5 ngày</span>
-					</button>
+					<div class="space-y-2.5">
+						<div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+							📊
+						</div>
+						<h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+							Thống Kê Tiến Độ
+						</h3>
+						<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+							Theo dõi số lượng thẻ đã thuộc, tần suất ôn tập và phân bổ từ vựng theo từng cấp độ JLPT.
+						</p>
+					</div>
+					<div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#1e293b] flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+						<span>N5: {data.levelCounts?.N5 ?? cards.length} thẻ</span>
+						<span class="group-hover:translate-x-1 transition-transform">Chi tiết →</span>
+					</div>
 				</div>
-			{:else}
-				<!-- Trên mobile người dùng chạm thẳng vào thẻ để lật, chỉ hiện nút gợi ý trên máy tính -->
-				<div class="hidden sm:block text-center py-0.5 sm:py-1">
-					<button
-						type="button"
-						class="px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-white/80 dark:bg-zinc-900/80 hover:bg-white dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer shadow-xs active:scale-98"
-						onclick={toggleFlip}
-					>
-						<span>Chạm thẻ để xem đáp án</span>
-						<span> (hoặc phím <kbd class="px-1.5 py-0.2 bg-zinc-100 dark:bg-zinc-800 text-rose-500 dark:text-rose-300 border border-zinc-300 dark:border-zinc-700 rounded font-mono font-bold text-[10px]">Space</kbd>)</span>
-					</button>
-				</div>
-			{/if}
-		</div>
+			</div>
+		</section>
+
+		<!-- QUICK VOCABULARY PREVIEW SECTION -->
+		<section class="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xs space-y-3">
+			<div class="flex items-center justify-between">
+				<h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+					<span>✨</span> Thẻ Từ Vựng Gần Đây
+				</h3>
+				<a href="/study" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+					Xem tất cả trong phòng học →
+				</a>
+			</div>
+
+			<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+				{#each cards.slice(0, 5) as card}
+					<div class="p-3 rounded-2xl bg-[#f8f9fb] dark:bg-[#0b0f19] border border-slate-200/80 dark:border-[#242f47] flex flex-col items-center justify-center text-center hover:border-indigo-400/60 transition-colors">
+						<span class="text-lg font-bold text-slate-900 dark:text-white font-jp">{card.term}</span>
+						<span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-jp">{card.reading}</span>
+						<span class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-1">{card.meaning}</span>
+					</div>
+				{/each}
+			</div>
+		</section>
 	</main>
 
-	<!-- Footer: Ẩn hoàn toàn trên mobile để màn hình tập trung 100% vào Thẻ và Chữ -->
-	<footer class="hidden sm:block w-full py-1.5 sm:py-2 text-center text-[10px] sm:text-[11px] text-zinc-400 dark:text-zinc-600 relative z-10">
-		FLCard-JP • Phím tắt: <kbd class="font-mono text-[10px]">Space</kbd> Lật • <kbd class="font-mono text-[10px]">← / →</kbd> Chuyển • <kbd class="font-mono text-[10px]">S</kbd> Trộn • <kbd class="font-mono text-[10px]">R</kbd> Bốc ngẫu nhiên • <kbd class="font-mono text-[10px]">1-4</kbd> Đánh giá
-	</footer>
-
-	<!-- Modal Popup Danh Sách Thẻ (Khi cần mới mở, không làm rối màn hình) -->
+	<!-- Modals -->
 	<DeckListModal
 		isOpen={isDeckListModalOpen}
 		{cards}
-		currentCardIndex={currentIndex}
-		onSelectCard={(idx) => { currentIndex = idx; isFlipped = false; }}
-		onEditCard={handleEditCard}
-		onDeleteCard={handleDeleteCard}
+		currentCardIndex={0}
+		onSelectCard={() => {}}
+		onEditCard={(card) => { cardToEdit = card; isCreateModalOpen = true; }}
+		onDeleteCard={async (idx) => {
+			const target = cards[idx];
+			if (target) {
+				cards = cards.filter((_, i) => i !== idx);
+				await fetch(`/api/cards?id=${encodeURIComponent(target.id)}`, { method: 'DELETE' });
+				showNotification(`🗑️ Đã xóa thẻ: "${target.term}"!`);
+			}
+		}}
 		onClose={() => isDeckListModalOpen = false}
 		onCreateNewCard={() => { cardToEdit = null; isCreateModalOpen = true; }}
 	/>
 
-	<!-- Modal Tạo & Chỉnh Sửa Thẻ -->
 	<CreateCardModal
 		isOpen={isCreateModalOpen}
 		{cardToEdit}
@@ -402,7 +319,6 @@
 		onSave={handleSaveCard}
 	/>
 
-	<!-- Modal Nhập Thẻ Hàng Loạt (Batch Import Studio) -->
 	<BatchImportModal
 		isOpen={isBatchImportModalOpen}
 		onClose={() => isBatchImportModalOpen = false}

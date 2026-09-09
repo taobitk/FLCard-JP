@@ -21,7 +21,9 @@ export const GET: RequestHandler = async ({ params, platform }) => {
 	}
 
 	const headers = new Headers();
-	object.writeHttpMetadata(headers);
+	if (object.httpMetadata?.contentType) {
+		headers.set('Content-Type', object.httpMetadata.contentType);
+	}
 	headers.set('etag', object.httpEtag);
 	headers.set('Cache-Control', 'public, max-age=31536000, immutable');
 

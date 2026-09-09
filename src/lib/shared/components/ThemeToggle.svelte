@@ -30,7 +30,7 @@
 <button
 	type="button"
 	id="theme-toggle-btn"
-	class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 border border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:text-amber-500 dark:hover:text-amber-400 shadow-sm active:scale-95 cursor-pointer"
+	class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 border border-slate-200 dark:border-[#242f47] bg-white dark:bg-[#151c2c] text-slate-700 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 shadow-sm active:scale-95 cursor-pointer"
 	onclick={toggleTheme}
 	title={isDark ? 'Chuyển sang giao diện Sáng (Light mode)' : 'Chuyển sang giao diện Tối (Dark mode)'}
 	aria-label="Chuyển đổi giao diện Sáng / Tối"
