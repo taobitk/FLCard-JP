@@ -230,8 +230,6 @@
 
 <!-- GIAO DIỆN CHUẨN ZEN: PHÒNG HỌC FLASHCARD (NO SCROLL, 100DVH CHO MOBILE) -->
 <div class="h-[100dvh] max-h-[100dvh] w-screen overflow-hidden flex flex-col justify-between pt-14 sm:pt-16 pb-safe bg-[#f8f9fb] dark:bg-[#0b0f19] text-slate-800 dark:text-slate-100 transition-colors duration-200 relative select-none touch-manipulation">
-	<!-- Ánh sáng nền tinh tế -->
-	<div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] bg-gradient-to-b from-indigo-500/10 via-emerald-500/5 to-transparent blur-3xl pointer-events-none"></div>
 
 	<!-- Navbar Cố Định -->
 	<Navbar
@@ -249,20 +247,20 @@
 	<!-- KHU VỰC TRUNG TÂM DUY NHẤT: THẺ HỌC FLASHCARD (Không cuộn, vừa khít màn hình) -->
 	<main class="flex-1 w-full max-w-lg mx-auto px-3 sm:px-4 py-1 sm:py-3 flex flex-col items-center justify-center relative z-10">
 		<!-- Thanh điều hướng thẻ tinh tế & nút quay lại Hub -->
-		<div class="w-full flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5 sm:mb-2.5 px-1 sm:px-2">
+		<div class="w-full flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 px-1 sm:px-2">
 			<div class="flex items-center gap-1.5">
 				<a 
 					href="/"
-					class="px-2.5 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200 dark:border-[#242f47] text-slate-600 dark:text-slate-300 hover:text-indigo-500 transition-all flex items-center gap-1 shadow-xs font-semibold"
+					class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1.5 shadow-2xs font-semibold"
 					title="Quay lại Dashboard Hub"
 				>
 					<span>🏠</span>
-					<span class="hidden sm:inline">Hub</span>
+					<span>Hub</span>
 				</a>
 
 				<button 
 					type="button"
-					class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200 dark:border-[#242f47] text-slate-600 dark:text-slate-300 hover:text-indigo-500 transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
+					class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 font-semibold"
 					onclick={prevCard}
 					title="Thẻ trước (Phím ←)"
 				>
@@ -275,32 +273,32 @@
 			<div class="flex items-center gap-1.5 sm:gap-2">
 				<button
 					type="button"
-					class="font-mono text-xs px-3.5 py-1 rounded-xl bg-white dark:bg-[#151c2c] border border-slate-200 dark:border-[#242f47] text-slate-700 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-500/60 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+					class="font-mono text-xs px-3.5 py-1 rounded-xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs font-bold"
 					onclick={() => isDeckListModalOpen = true}
 					title="Bấm để xem danh sách toàn bộ thẻ"
 				>
-					<span class="text-indigo-600 dark:text-indigo-400 font-bold">{currentIndex + 1}</span>
-					<span class="text-slate-400">/</span>
+					<span class="text-indigo-600 dark:text-indigo-400">{currentIndex + 1}</span>
+					<span class="text-slate-400 font-normal">/</span>
 					<span>{cards.length}</span>
-					<span class="text-[10px] text-slate-400">▼</span>
+					<span class="text-[9px] text-slate-400">▼</span>
 				</button>
 
 				<!-- Nút Trộn Thẻ Ngẫu Nhiên (Shuffle Mode) -->
 				<button
 					type="button"
 					id="btn-shuffle-deck"
-					class="px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95 {isShuffled ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 ring-2 ring-amber-400/20 font-bold' : 'bg-white dark:bg-[#151c2c] border-slate-200 dark:border-[#242f47] text-slate-600 dark:text-slate-400 hover:text-amber-500'}"
+					class="px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 {isShuffled ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 font-bold' : 'bg-white dark:bg-[#151c2c] border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-300 hover:text-amber-500'}"
 					onclick={toggleShuffle}
 					title={isShuffled ? 'Đang bật trộn ngẫu nhiên. Bấm để khôi phục thứ tự gốc (Phím S)' : 'Trộn ngẫu nhiên thứ tự các thẻ (Phím S)'}
 				>
-					<span class="text-xs leading-none">🔀</span>
+					<span>🔀</span>
 					<span class="hidden sm:inline">{isShuffled ? 'Đang trộn' : 'Trộn'}</span>
 				</button>
 			</div>
 
 			<button 
 				type="button"
-				class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200 dark:border-[#242f47] text-slate-600 dark:text-slate-300 hover:text-indigo-500 transition-all cursor-pointer flex items-center gap-1 shadow-xs active:scale-95"
+				class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 font-semibold"
 				onclick={nextCard}
 				title="Thẻ tiếp theo (Phím →)"
 			>
@@ -367,14 +365,14 @@
 					</button>
 				</div>
 			{:else}
-				<div class="hidden sm:block text-center py-0.5 sm:py-1">
+				<div class="hidden sm:block text-center py-1">
 					<button
 						type="button"
-						class="px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-white/80 dark:bg-[#151c2c]/80 hover:bg-white dark:hover:bg-[#1e293b] border border-slate-200 dark:border-[#242f47] transition-all cursor-pointer shadow-xs active:scale-98"
+						class="px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-2xs active:scale-98"
 						onclick={toggleFlip}
 					>
 						<span>Chạm thẻ để xem đáp án</span>
-						<span> (hoặc phím <kbd class="px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 text-indigo-500 dark:text-indigo-300 border border-slate-300 dark:border-slate-700 rounded font-mono font-bold text-[10px]">Space</kbd>)</span>
+						<span> (hoặc <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-indigo-500 dark:text-indigo-400 border border-slate-300 dark:border-slate-700 rounded font-mono font-bold text-[10px]">Space</kbd>)</span>
 					</button>
 				</div>
 			{/if}

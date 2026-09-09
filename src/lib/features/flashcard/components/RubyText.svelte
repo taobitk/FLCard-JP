@@ -15,7 +15,7 @@
 	};
 </script>
 
-<span class="ruby-container {sizeClasses[size]} font-jp font-bold text-zinc-900 dark:text-zinc-100 select-none">
+<span class="ruby-container {sizeClasses[size]} font-jp font-extrabold text-slate-900 dark:text-white select-none">
 	{#if rubyHtml}
 		{@html rubyHtml}
 	{:else}
@@ -33,13 +33,13 @@
 	.ruby-container :global(rt) {
 		font-size: 0.42em;
 		font-weight: 600;
-		color: #71717a; /* Zinc-500 in light mode */
+		color: #64748b;
 		line-height: 1;
 		user-select: none;
 		letter-spacing: 0.05em;
 	}
 
 	:global(.dark) .ruby-container :global(rt) {
-		color: #a1a1aa; /* Zinc-400 in dark mode */
+		color: #94a3b8;
 	}
 </style>
