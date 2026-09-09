@@ -15,7 +15,8 @@
 		"start": "python .agents/scripts/smart_run.py",
 		"test:e2e": "playwright test --workers=1",
 		"test:bdd": "python .agents/scripts/bdd_checker.py",
-		"test": "npm run test:bdd && npm run test:e2e"
+		"test": "npm run test:bdd && npm run test:e2e",
+		"push": "python .agents/scripts/smart_push.py"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
