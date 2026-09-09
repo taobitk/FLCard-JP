@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Outfit', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+  --font-jp: 'Noto Sans JP', sans-serif;
+
+  /* Bảng màu JLPT Level chuẩn Nhật Bản */
+  --color-jlpt-n5: #10b981; /* N5: Xanh ngọc lục bảo */
+  --color-jlpt-n4: #3b82f6; /* N4: Xanh dương đại dương */
+  --color-jlpt-n3: #f59e0b; /* N3: Vàng hổ phách */
+  --color-jlpt-n2: #f97316; /* N2: Cam hoàng hôn */
+  --color-jlpt-n1: #ef4444; /* N1: Đỏ thẫm */
+
+  /* Màu SRS Rating */
+  --color-srs-again: #ef4444;
+  --color-srs-hard: #f97316;
+  --color-srs-good: #3b82f6;
+  --color-srs-easy: #10b981;
+}
+
+@layer base {
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply h-full overflow-hidden antialiased selection:bg-rose-500/30 selection:text-rose-600 dark:selection:text-rose-200 transition-colors duration-300;
+    font-family: var(--font-sans);
+    /* Mặc định Light mode: Phong cách giấy Washi Nhật Bản ấm áp */
+    @apply bg-zinc-100 text-zinc-800;
+  }
+
+  /* Dark mode: Than chì sâu thẳm sang trọng */
+  html.dark body {
+    @apply bg-zinc-950 text-zinc-100;
+  }
+}

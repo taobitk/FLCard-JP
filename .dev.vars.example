@@ -1,0 +1,31 @@
+# ==========================================
+# FLCard-JP - MẪU CẤU HÌNH BIẾN MÔI TRƯỜNG (.dev.vars.example)
+# ==========================================
+# File này CHỈ chứa các Secret/API Key nhạy cảm (Private).
+#
+# LƯU Ý QUAN TRỌNG:
+# - D1 Database ID & R2 Bucket binding được cấu hình trong `wrangler.jsonc`
+#   (Binding: env.DB và env.BUCKET trong Cloudflare Workers).
+# - File .dev.vars này chỉ chứa API Keys & Secrets cho dev local!
+# ==========================================
+
+# 1. BẢO MẬT PHIÊN HỌC & AUTH (COOKIE SESSION)
+# --------------------------------------------------
+# Chuỗi bí mật ngẫu nhiên dùng để ký/mã hóa Cookie session
+SESSION_SECRET="your_32_character_random_secret_here"
+
+# 2. AI SERVICES (TỰ ĐỘNG SINH THẺ & CÂU VÍ DỤ)
+# --------------------------------------------------
+# Google Gemini API Key (Lấy tại aistudio.google.com)
+GEMINI_API_KEY="your_gemini_api_key_here"
+
+# Cloudflare Account ID & Workers AI / API Token (nếu gọi qua REST API)
+CLOUDFLARE_ACCOUNT_ID="your_cloudflare_account_id_here"
+CLOUDFLARE_API_TOKEN="your_cloudflare_api_token_here"
+CLOUDFLARE_WORKERS_API_KEY="your_cloudflare_workers_api_key_here"
+
+# 3. R2 S3-COMPATIBLE API (Tùy chọn: chỉ cần nếu dùng AWS S3 Client)
+# --------------------------------------------------
+# CLOUDFLARE_R2_ACCESS_KEY_ID="your_r2_access_key_id_here"
+# CLOUDFLARE_R2_SECRET_ACCESS_KEY="your_r2_secret_access_key_here"
+

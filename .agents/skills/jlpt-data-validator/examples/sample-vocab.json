@@ -1,0 +1,22 @@
+{
+  "deckId": "n5-starter",
+  "title": "Từ vựng N5 cơ bản",
+  "level": "N5",
+  "cards": [
+    {
+      "id": "card-001",
+      "term": "食べる",
+      "reading": "たべる",
+      "romaji": "taberu",
+      "rubyHtml": "<ruby>食<rt>た</rt></ruby>べる",
+      "meaning": "Ăn",
+      "level": "N5",
+      "examples": [
+        {
+          "japanese": "ご飯を食べる",
+          "vietnamese": "Ăn cơm"
+        }
+      ]
+    }
+  ]
+}

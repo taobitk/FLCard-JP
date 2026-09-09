@@ -1,0 +1,14 @@
+{
+  "term": "勉強する",
+  "reading": "べんきょうする",
+  "romaji": "benkyousuru",
+  "rubyHtml": "<ruby>勉<rt>べん</rt></ruby><ruby>強<rt>きょう</rt></ruby>する",
+  "meaning": "Học, học tập",
+  "level": "N5",
+  "type": "Động từ",
+  "example": {
+    "japanese": "毎日日本語を勉強します。",
+    "vietnamese": "Tôi học tiếng Nhật mỗi ngày.",
+    "rubyHtml": "<ruby>毎<rt>まい</rt></ruby><ruby>日<rt>にち</rt></ruby><ruby>日<rt>に</rt></ruby><ruby>本<rt>ほん</rt></ruby><ruby>語<rt>ご</rt></ruby>を<ruby>勉<rt>べん</rt></ruby><ruby>強<rt>きょう</rt></ruby>します。"
+  }
+}

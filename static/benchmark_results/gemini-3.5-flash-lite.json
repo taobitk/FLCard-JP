@@ -1,0 +1,13 @@
+{
+  "term": "猫",
+  "reading": "ねこ",
+  "romaji": "neko",
+  "rubyHtml": "<ruby>猫<rt>ねこ</rt></ruby>",
+  "meaning": "con mèo",
+  "level": "JLPT N5",
+  "type": "Danh từ",
+  "example": {
+    "japanese": "庭に猫がいます。",
+    "vietnamese": "Có một con mèo ở trong vườn."
+  }
+}

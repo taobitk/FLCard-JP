@@ -1,0 +1,45 @@
+{
+  "result": {
+    "id": "chatcmpl-998dbd1d59afc769",
+    "object": "chat.completion",
+    "created": 1788593443,
+    "model": "@cf/zai-org/glm-4.7-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```json\n[\n  {\n    \"term\": \"猫\",\n    \"reading\": \"ねこ (Neko)\",\n    \"meaning\": \"Con mèo\",\n    \"example\": \"猫が寝ています。\"\n  }\n]\n```",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": "1.  **Analyze the Request:**\n    *   **Role:** Japanese Assistant.\n    *   **Task:** Analyze a specific Japanese word into a JSON format containing: `term`, `reading`, `meaning`, `example`.\n    *   **Word to Analyze:** 猫  - \"Neko\" (Con mèo).\n\n2.  **Analyze the Word:**\n    *   **Kanji:** 猫 .\n    *   **Kana/Reading:** ねこ (Neko). It can also be read as used for female names (like Hitoe) but here the context is the animal, so \"neko\" is the primary reading.\n    *   **Meaning:** Cat (denoted by \"con mèo\" in the prompt, standard dictionary definition: a small furry domesticated mammal).\n    *   **Example Sentence:**\n        *   Need a sentence where 나 can see the word used naturally.\n        *   *Option 1:* 私は猫が好きです。 - I like cats. (Simple)\n        *   *Option 2:* 猫が壁に登っています。 - The cat is climbing on the wall. (Descriptive)\n        *   *Selection:* Option 1 is very common and clear, but Option 2 shows an intransitive verb conjugation. Let's go with something standard like \"The cat likes fish\" or \"I have a cat\". Let's stick to a classic: \"My cat likes milk\" or \"I have a cat\".\n        *   *Specific Sentence:* \"My cat sleeps a lot.\" -> 私の猫はよく寝ます。.\n        *   *Alternative:* \"Cats are cute.\" -> 猫は可愛いです。.\n        *   *Let's pick:* \"My cat like fish.\" -> 私の猫は魚が好きです。.\n        *   *Actually, the simplest is often best for examples:* \"The cat needs to eat.\" -> 猫はご飯を食べなきゃいけません。. No, that's too complex.\n        *   *Let's go with:* \"The cat is sleeping.\" -> 猫が寝ています。.\n\n3.  **Construct the JSON:**\n    *   Root object (or array, usually \"list of words\" allows multiple, but the prompt asks to \"analyze the word\" (singular), so a single object or a list with 1 item is fine. I will provide a list with one object for consistency).\n\n    *   ```json\n      [\n        {\n          \"term\": \"猫\",\n          \"reading\": \"ねこ (Neko)\",\n          \"meaning\": \"Con mèo\",\n          \"example\": \"猫が寝ています。\"\n        }\n      ]\n      ```\n\n4.  **Review and Refine:**\n    *   Does the JSON follow standard format? Yes.\n    *   Is the data accurate? Yes.\n    *   Is the tone appropriate? Yes.\n\n5.  **Final Output Generation:** (Produce the JSON block).",
+          "reasoning_content": "1.  **Analyze the Request:**\n    *   **Role:** Japanese Assistant.\n    *   **Task:** Analyze a specific Japanese word into a JSON format containing: `term`, `reading`, `meaning`, `example`.\n    *   **Word to Analyze:** 猫  - \"Neko\" (Con mèo).\n\n2.  **Analyze the Word:**\n    *   **Kanji:** 猫 .\n    *   **Kana/Reading:** ねこ (Neko). It can also be read as used for female names (like Hitoe) but here the context is the animal, so \"neko\" is the primary reading.\n    *   **Meaning:** Cat (denoted by \"con mèo\" in the prompt, standard dictionary definition: a small furry domesticated mammal).\n    *   **Example Sentence:**\n        *   Need a sentence where 나 can see the word used naturally.\n        *   *Option 1:* 私は猫が好きです。 - I like cats. (Simple)\n        *   *Option 2:* 猫が壁に登っています。 - The cat is climbing on the wall. (Descriptive)\n        *   *Selection:* Option 1 is very common and clear, but Option 2 shows an intransitive verb conjugation. Let's go with something standard like \"The cat likes fish\" or \"I have a cat\". Let's stick to a classic: \"My cat likes milk\" or \"I have a cat\".\n        *   *Specific Sentence:* \"My cat sleeps a lot.\" -> 私の猫はよく寝ます。.\n        *   *Alternative:* \"Cats are cute.\" -> 猫は可愛いです。.\n        *   *Let's pick:* \"My cat like fish.\" -> 私の猫は魚が好きです。.\n        *   *Actually, the simplest is often best for examples:* \"The cat needs to eat.\" -> 猫はご飯を食べなきゃいけません。. No, that's too complex.\n        *   *Let's go with:* \"The cat is sleeping.\" -> 猫が寝ています。.\n\n3.  **Construct the JSON:**\n    *   Root object (or array, usually \"list of words\" allows multiple, but the prompt asks to \"analyze the word\" (singular), so a single object or a list with 1 item is fine. I will provide a list with one object for consistency).\n\n    *   ```json\n      [\n        {\n          \"term\": \"猫\",\n          \"reading\": \"ねこ (Neko)\",\n          \"meaning\": \"Con mèo\",\n          \"example\": \"猫が寝ています。\"\n        }\n      ]\n      ```\n\n4.  **Review and Refine:**\n    *   Does the JSON follow standard format? Yes.\n    *   Is the data accurate? Yes.\n    *   Is the tone appropriate? Yes.\n\n5.  **Final Output Generation:** (Produce the JSON block)."
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": 154827,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 48,
+      "completion_tokens": 696,
+      "total_tokens": 744,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "neurons": 25.5984
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "success": true,
+  "errors": [],
+  "messages": []
+}

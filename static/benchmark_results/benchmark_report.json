@@ -1,0 +1,142 @@
+[
+  {
+    "model": "gemini-2.5-flash-lite",
+    "category": "Chat/JSON",
+    "status": "HTTP 404",
+    "time": "0.26s",
+    "output": "{\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash-lite is no longer available to new us"
+  },
+  {
+    "model": "gemini-3.5-flash-lite",
+    "category": "Chat/JSON",
+    "status": "SUCCESS",
+    "time": "1.16s",
+    "output": "Saved to gemini-3.5-flash-lite.json"
+  },
+  {
+    "model": "gemini-flash-lite-latest",
+    "category": "Chat/JSON",
+    "status": "SUCCESS",
+    "time": "1.26s",
+    "output": "Saved to gemini-flash-lite-latest.json"
+  },
+  {
+    "model": "gemini-3.1-flash-lite",
+    "category": "Chat/JSON",
+    "status": "SUCCESS",
+    "time": "1.47s",
+    "output": "Saved to gemini-3.1-flash-lite.json"
+  },
+  {
+    "model": "gemini-2.5-flash",
+    "category": "Chat/JSON",
+    "status": "HTTP 404",
+    "time": "0.17s",
+    "output": "{\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. "
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "category": "Chat/JSON",
+    "status": "HTTP 503",
+    "time": "1.12s",
+    "output": "{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are u"
+  },
+  {
+    "model": "gemini-2.5-pro",
+    "category": "Chat/JSON",
+    "status": "HTTP 404",
+    "time": "0.17s",
+    "output": "{\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-pro is no longer available to new users. Pl"
+  },
+  {
+    "model": "gemini-3.1-pro-preview",
+    "category": "Chat/JSON",
+    "status": "HTTP 429",
+    "time": "0.17s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-pro-latest",
+    "category": "Chat/JSON",
+    "status": "HTTP 429",
+    "time": "0.19s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-3.7-flash",
+    "category": "Chat/JSON",
+    "status": "SUCCESS",
+    "time": "2.22s",
+    "output": "Saved to gemini-3.7-flash.json"
+  },
+  {
+    "model": "gemini-3.6-flash",
+    "category": "Chat/JSON",
+    "status": "SUCCESS",
+    "time": "5.50s",
+    "output": "Saved to gemini-3.6-flash.json"
+  },
+  {
+    "model": "gemini-2.5-pro-preview-tts",
+    "category": "TTS/Audio",
+    "status": "HTTP 429",
+    "time": "0.17s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-3.1-flash-image",
+    "category": "Image",
+    "status": "HTTP 429",
+    "time": "0.18s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-3.1-flash-image-preview",
+    "category": "Image",
+    "status": "HTTP 429",
+    "time": "0.15s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-2.5-flash-image",
+    "category": "Image",
+    "status": "HTTP 429",
+    "time": "0.16s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-3-pro-image",
+    "category": "Image",
+    "status": "HTTP 429",
+    "time": "0.17s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-3-pro-image-preview",
+    "category": "Image",
+    "status": "HTTP 429",
+    "time": "0.15s",
+    "output": "{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing deta"
+  },
+  {
+    "model": "gemini-flash-latest",
+    "category": "Chat/JSON",
+    "status": "HTTP 503",
+    "time": "5.90s",
+    "output": "{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are u"
+  },
+  {
+    "model": "gemini-3.1-flash-tts-preview",
+    "category": "TTS/Audio",
+    "status": "NO_AUDIO",
+    "time": "7.61s",
+    "output": "No inlineData in response"
+  },
+  {
+    "model": "gemini-2.5-flash-preview-tts",
+    "category": "TTS/Audio",
+    "status": "NO_AUDIO",
+    "time": "20.25s",
+    "output": "No inlineData in response"
+  }
+]
