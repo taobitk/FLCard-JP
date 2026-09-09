@@ -18,12 +18,9 @@
 				<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-rose-500 flex items-center justify-center font-bold font-jp text-white text-base shadow-md group-hover:scale-105 transition-transform border border-indigo-400/30 flex-shrink-0">
 					日
 				</div>
-				<div class="hidden sm:flex flex-col">
-					<span class="brand-title font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-						FLCard<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">-JP</span>
-					</span>
-					<span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Smart Japanese Hub</span>
-				</div>
+				<span class="brand-title font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+					FLCard<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">-JP</span>
+				</span>
 			</a>
 
 			<!-- Nav Navigation Links -->
