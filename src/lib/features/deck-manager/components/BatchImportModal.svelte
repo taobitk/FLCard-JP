@@ -275,7 +275,21 @@
 								onclick={() => copyToClipboard(SAMPLE_JSON_TEMPLATE, 'Mẫu JSON')}
 							>
 								<span>📄</span>
-								<span>Mẫu JSON</span>
+								<span class="inline sm:hidden">Mẫu JSON</span>
+								<span class="hidden sm:inline">Copy Mẫu JSON</span>
+							</button>
+							<button
+								type="button"
+								class="px-2.5 py-1 text-[11px] sm:text-xs rounded-xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-semibold hover:bg-amber-500/20 transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1"
+								onclick={() => {
+									jsonContent = SAMPLE_JSON_TEMPLATE;
+									validationErrors = [];
+									copyNotification = 'Đã điền Mẫu JSON vào khung nhập liệu!';
+									setTimeout(() => { copyNotification = ''; }, 2500);
+								}}
+							>
+								<span>⚡</span>
+								<span>Điền mẫu thử</span>
 							</button>
 						</div>
 

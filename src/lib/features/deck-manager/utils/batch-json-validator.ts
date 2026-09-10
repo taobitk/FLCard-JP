@@ -124,8 +124,8 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 		if (item.term && item.reading && item.meaning) {
 			const term = String(item.term).trim();
 			const reading = String(item.reading).trim();
-			const romaji = (typeof item.romaji === 'string' && item.romaji.trim()) 
-				? item.romaji.trim().toLowerCase() 
+			const romaji = (typeof item.romaji === 'string' && item.romaji.trim())
+				? item.romaji.trim().toLowerCase()
 				: toRomaji(reading);
 
 			const rubyHtml = (typeof item.rubyHtml === 'string' && item.rubyHtml.trim())
@@ -188,40 +188,85 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 }
 
 /**
- * Mẫu JSON chuẩn 100% để hiển thị hoặc copy
+ * Mẫu JSON chuẩn 100% kèm trường tags (Faceted Taxonomy) để hiển thị hoặc copy
  */
 export const SAMPLE_JSON_TEMPLATE = JSON.stringify([
-  {
-    "term": "食べる",
-    "reading": "たべる",
-    "romaji": "taberu",
-    "meaning": "Ăn (thức ăn, cơm)",
-    "level": "N5",
-    "type": "Động từ nhóm 2",
-    "example": {
-      "japanese": "ご飯を食べます。",
-      "vietnamese": "Tôi ăn cơm."
-    }
-  },
-  {
-    "term": "日本語",
-    "reading": "にほんご",
-    "romaji": "nihongo",
-    "meaning": "Tiếng Nhật",
-    "level": "N5",
-    "type": "Danh từ",
-    "example": {
-      "japanese": "日本語を勉強します。",
-      "vietnamese": "Tôi học tiếng Nhật."
-    }
-  }
+	{
+		"term": "食べる",
+		"reading": "たべる",
+		"romaji": "taberu",
+		"meaning": "Ăn (thức ăn, cơm)",
+		"level": "N5",
+		"type": "Động từ nhóm 2",
+		"tags": [
+			"topic:food_drink",
+			"where:restaurant",
+			"tone:polite"
+		],
+		"example": {
+			"japanese": "ご飯を食べます。",
+			"vietnamese": "Tôi ăn cơm."
+		}
+	},
+	{
+		"term": "日本語",
+		"reading": "にほんご",
+		"romaji": "nihongo",
+		"meaning": "Tiếng Nhật",
+		"level": "N5",
+		"type": "Danh từ",
+		"tags": [
+			"topic:education",
+			"where:school",
+			"tone:formal"
+		],
+		"example": {
+			"japanese": "日本語を勉強します。",
+			"vietnamese": "Tôi học tiếng Nhật."
+		}
+	},
+	{
+		"term": "桜",
+		"reading": "さくら",
+		"romaji": "sakura",
+		"meaning": "Hoa anh đào",
+		"level": "N5",
+		"type": "Danh từ",
+		"tags": [
+			"topic:nature_weather",
+			"where:nature",
+			"tone:polite"
+		],
+		"example": {
+			"japanese": "春に桜が綺麗に咲きます。",
+			"vietnamese": "Mùa xuân hoa anh đào nở rất đẹp."
+		}
+	}
 ], null, 2);
 
 /**
- * Mẫu Prompt chuẩn để gửi cho ChatGPT / Gemini
+ * Mẫu Prompt chuẩn để gửi cho ChatGPT / Gemini tạo dữ liệu JSON hợp lệ 100%
  */
-export const SAMPLE_AI_PROMPT = `Bạn là một trợ lý ngôn ngữ tiếng Nhật chuyên sâu. Hãy tạo danh sách từ vựng tiếng Nhật theo danh sách sau:
-[DÁN DANH SÁCH TỪ CỦA BẠN VÀO ĐÂY]
+export const SAMPLE_AI_PROMPT = `Bạn là một chuyên gia biên soạn giáo trình tiếng Nhật JLPT. Hãy chuyển đổi danh sách từ vựng dưới đây thành định dạng JSON Array chuẩn hóa 100% để nạp vào ứng dụng FLCard-JP:
 
-Xuất ra ĐÚNG định dạng JSON Array nguyên bản (không bọc giải thích dông dài), tuân thủ cấu trúc mẫu sau:
+[DÁN DANH SÁCH TỪ VỰNG CỦA BẠN VÀO ĐÂY]
+
+YÊU CẦU CẤU TRÚC JSON (Mỗi phần tử đại diện 1 thẻ flashcard):
+- "term": Từ tiếng Nhật (Kanji/Kana).
+- "reading": Cách đọc thuần Hiragana/Katakana (không chứa Kanji).
+- "romaji": Phiên âm Latinh chuẩn Hepburn (vd: taberu, nihongo, sakura).
+- "meaning": Nghĩa tiếng Việt ngắn gọn, súc tích.
+- "level": Cấp độ JLPT bắt buộc (chỉ 1 trong: "N5", "N4", "N3", "N2", "N1").
+- "type": Từ loại (chỉ 1 trong: "Danh từ", "Động từ nhóm 1", "Động từ nhóm 2", "Động từ nhóm 3", "Tính từ đuôi い", "Tính từ đuôi な", "Phó từ", "Cụm từ").
+- "tags": Mảng phân loại Faceted Taxonomy:
+  + "topic:<chủ_đề>": Chọn 1 trong [food_drink, daily_routine, home_life, work_business, transport, shopping, nature_weather, health_body, education, leisure_hobby, social_culture, tech_science, identity, abstract_mind, general]
+  + "where:<bối_cảnh>": Chọn 1 trong [home, restaurant, office, station, store, hospital, school, general]
+  + "tone:<sắc_thái>": Chọn 1 trong [polite, casual, formal]
+- "example": Ví dụ câu gồm "japanese" (câu ví dụ tiếng Nhật) và "vietnamese" (dịch nghĩa).
+
+Quy tắc xuất kết quả:
+- Xuất DUY NHẤT một mảng JSON nguyên bản [ { ... } ].
+- Tuyệt đối KHÔNG bọc trong markdown \`\`\`json và KHÔNG kèm văn bản giải thích nào khác.
+
+Cấu trúc mẫu tham khảo:
 ${SAMPLE_JSON_TEMPLATE}`;
