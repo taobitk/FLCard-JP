@@ -9,16 +9,10 @@ test.describe('Feature: Kiểm thử nền tảng và kết nối hệ thống (
 			await page.waitForLoadState('networkidle');
 		});
 
-		// When: Trang web tải xong hoàn tất, người dùng kiểm tra các thành phần trung tâm
-		await test.step('When: Chờ trang web sẵn sàng và kiểm tra giao diện Portal Hub', async () => {
-			const brandTitle = page.locator('.brand-title');
-			await expect(brandTitle).toBeVisible();
-			await expect(brandTitle).toContainText('FLCard-JP');
-
-			// Kiểm tra badge cấp độ hiển thị
-			const levelPill = page.locator('.level-pill');
-			await expect(levelPill).toBeVisible();
-			await expect(levelPill).toHaveText('N5');
+		// When: Trang web tải xong hoàn tất, người dùng kiểm tra logo trung tâm trên Navbar
+		await test.step('When: Chờ trang web sẵn sàng và kiểm tra logo thương hiệu', async () => {
+			const brandLogo = page.locator('header img[alt="FLCard-JP Logo"]');
+			await expect(brandLogo).toBeVisible();
 		});
 
 		// Then: Người dùng bấm vào phòng ôn Flashcard và tương tác lật thẻ
@@ -36,6 +30,11 @@ test.describe('Feature: Kiểm thử nền tảng và kết nối hệ thống (
 			const flashcard = page.locator('.flashcard');
 			await expect(cardScene).toBeVisible();
 			await expect(flashcard).not.toHaveClass(/flipped/);
+
+			// Kiểm tra badge cấp độ hiển thị trên thẻ học
+			const levelPill = page.locator('.level-pill');
+			await expect(levelPill).toBeVisible();
+			await expect(levelPill).toHaveText('N5');
 
 			// Click lật thẻ
 			await cardScene.click();

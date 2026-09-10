@@ -12,16 +12,16 @@
 <!-- Navbar Cố Định (Fixed at top, responsive for mobile) -->
 <header class="fixed top-0 left-0 right-0 z-40 w-full h-14 sm:h-16 border-b border-slate-200/80 dark:border-[#242f47] bg-white/85 dark:bg-[#0b0f19]/85 backdrop-blur-xl shadow-xs transition-colors duration-200">
 	<div class="max-w-5xl mx-auto px-3 sm:px-6 h-full flex items-center justify-between">
-		<!-- Brand Logo -->
+		<!-- Brand Logo: Chỉ hiển thị Logo chú nai ngơ ngác đã tách nền -->
 		<div class="flex items-center gap-3">
-			<a href="/" class="flex items-center gap-2 group">
-				<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-rose-500 flex items-center justify-center font-bold font-jp text-white text-base shadow-md group-hover:scale-105 transition-transform border border-indigo-400/30 flex-shrink-0">
-					日
+			<a href="/" class="flex items-center group transition-transform active:scale-95" title="Trang chủ FLCard-JP" aria-label="FLCard-JP">
+				<div class="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center">
+					<img 
+						src="/images/logo.png" 
+						alt="FLCard-JP Logo" 
+						class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200 drop-shadow-sm" 
+					/>
 				</div>
-				<span class="brand-title font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-					<span>FLCard<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">-JP</span></span>
-					<span class="level-pill text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">N5</span>
-				</span>
 			</a>
 		</div>
 
