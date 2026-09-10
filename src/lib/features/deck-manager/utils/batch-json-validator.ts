@@ -82,9 +82,10 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 			return;
 		}
 
-		// Kiểm tra trường bắt buộc: term
-		if (typeof item.term !== 'string' || !item.term.trim()) {
-			errors.push(`Thẻ #${itemNum}: Thiếu trường 'term' (chữ Kanji/Từ tiếng Nhật bắt buộc).`);
+		// Hỗ trợ cả 'term', 'japanese', 'kanji', 'word' để tương thích ngược linh hoạt
+		const rawTerm = item.term || item.japanese || item.word || item.kanji;
+		if (typeof rawTerm !== 'string' || !rawTerm.trim()) {
+			errors.push(`Thẻ #${itemNum}: Thiếu trường 'term' (hoặc 'japanese' / 'kanji').`);
 		}
 
 		// Kiểm tra trường bắt buộc: reading
@@ -97,11 +98,9 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 			errors.push(`Thẻ #${itemNum}: Thiếu trường 'meaning' (nghĩa tiếng Việt bắt buộc).`);
 		}
 
-		// Kiểm tra trường bắt buộc: level
+		// Kiểm tra trường level: nếu để trống thì mặc định là 'N5'
 		let level: JLPTLevel = 'N5';
-		if (!item.level) {
-			errors.push(`Thẻ #${itemNum}: Thiếu trường 'level' (cấp độ JLPT bắt buộc: N5, N4, N3, N2, N1).`);
-		} else {
+		if (item.level) {
 			const lvlUpper = String(item.level).toUpperCase() as JLPTLevel;
 			if (!VALID_LEVELS.includes(lvlUpper)) {
 				errors.push(`Thẻ #${itemNum}: Cấp độ '${item.level}' không hợp lệ. Chỉ chấp nhận: N5, N4, N3, N2, N1.`);
@@ -121,8 +120,8 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 		}
 
 		// Nếu không có lỗi cấu trúc cơ bản thì tạo thẻ hoàn chỉnh
-		if (item.term && item.reading && item.meaning) {
-			const term = String(item.term).trim();
+		if (rawTerm && item.reading && item.meaning) {
+			const term = String(rawTerm).trim();
 			const reading = String(item.reading).trim();
 			const romaji = (typeof item.romaji === 'string' && item.romaji.trim())
 				? item.romaji.trim().toLowerCase()
