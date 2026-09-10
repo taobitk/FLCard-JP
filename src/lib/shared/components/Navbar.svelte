@@ -18,8 +18,9 @@
 				<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-rose-500 flex items-center justify-center font-bold font-jp text-white text-base shadow-md group-hover:scale-105 transition-transform border border-indigo-400/30 flex-shrink-0">
 					日
 				</div>
-				<span class="brand-title font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-					FLCard<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">-JP</span>
+				<span class="brand-title font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+					<span>FLCard<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500">-JP</span></span>
+					<span class="level-pill text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">N5</span>
 				</span>
 			</a>
 
