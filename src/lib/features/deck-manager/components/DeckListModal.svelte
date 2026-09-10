@@ -152,6 +152,13 @@
 												</span>
 											{/each}
 										</div>
+									{:else}
+										<div class="mt-1">
+											<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
+												<span>⏳</span>
+												<span>Đang phân loại tag AI...</span>
+											</span>
+										</div>
 									{/if}
 								</div>
 							</div>

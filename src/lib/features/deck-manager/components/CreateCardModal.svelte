@@ -156,16 +156,39 @@
 
 		isSuggestingTags = true;
 		try {
-			const res = await classifyWordWithAI({
+			// Gọi API /api/tags (sử dụng Gemini AI Studio từ backend)
+			const res = await fetch('/api/tags', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					term: term || '言葉',
+					meaning: meaning || 'từ vựng',
+					reading: readingInput.trim() || autoHiragana.trim(),
+					cardType: typeInput
+				})
+			});
+
+			if (res.ok) {
+				const data = (await res.json()) as any;
+				if (data.result) {
+					selectedTopic = data.result.topic;
+					selectedContext = data.result.context;
+					tagsInput = data.result.tags;
+					return;
+				}
+			}
+
+			// Dự phòng heuristic 0ms nếu API không khả dụng
+			const fallback = await classifyWordWithAI({
 				term: term || '言葉',
 				meaning: meaning || 'từ vựng',
 				reading: readingInput.trim() || autoHiragana.trim(),
 				cardType: typeInput
 			});
 
-			selectedTopic = res.topic;
-			selectedContext = res.context;
-			tagsInput = res.tags;
+			selectedTopic = fallback.topic;
+			selectedContext = fallback.context;
+			tagsInput = fallback.tags;
 		} catch (err) {
 			console.error('Lỗi gợi ý tag:', err);
 		} finally {

@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ platform }) => {
  * POST /api/tags
  * Gửi từ vựng để AI tự động phân loại tag (Topic, Context, Tone)
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
 		const body = (await request.json()) as any;
 		const { term, meaning, reading, cardType } = body || {};
@@ -48,13 +48,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Thiếu thông tin term hoặc meaning để phân loại' }, { status: 400 });
 		}
 
-		// Gọi service phân loại (đang dừng ở cổng chờ cấu hình model theo chỉ dẫn user)
+		const apiKey = (platform?.env as any)?.GEMINI_API_KEY || (platform?.env as any)?.GOOGLE_API_KEY;
+
+		// Gọi service phân loại với apiKey Google AI Studio (fallback sang heuristic nếu không có)
 		const result = await classifyWordWithAI({
 			term,
 			meaning,
 			reading,
 			cardType
-		});
+		}, apiKey);
 
 		return json({
 			success: true,

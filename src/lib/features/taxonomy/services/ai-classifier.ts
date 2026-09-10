@@ -48,19 +48,44 @@ Hãy trả về kết quả thuần JSON không kèm markdown:
 }
 `.trim();
 
-/**
- * Phân loại từ vựng bằng AI
- * 
- * LƯU Ý: Đang dừng ở cổng gọi API thực tế theo yêu cầu của User.
- * Sẵn sàng kết nối với Model chỉ định (Gemini 2.5 Flash, Workers AI, v.v.).
- */
-export async function classifyWordWithAI(request: ClassificationRequest): Promise<ClassificationResult> {
-	// =========================================================================
-	// [KHUNG CHỜ GỌI AI API]: Dừng ở đây theo chỉ dẫn của User.
-	// Lát nữa sẽ cấu hình Client cụ thể theo hướng dẫn của bạn (Gemini, Workers AI, etc.)
-	// =========================================================================
+import { classifyBatchWithGemini } from './gemini-classifier';
 
-	// Heuristic phân loại sơ bộ tạm thời trong lúc chờ tích hợp Model:
+export async function classifyWordWithAI(
+	request: ClassificationRequest,
+	apiKey?: string
+): Promise<ClassificationResult> {
+	// 1. Thử gọi Google Gemini nếu có apiKey
+	if (apiKey) {
+		try {
+			const batchRes = await classifyBatchWithGemini(
+				[
+					{
+						id: 'single',
+						term: request.term,
+						meaning: request.meaning,
+						reading: request.reading,
+						cardType: request.cardType
+					}
+				],
+				apiKey
+			);
+
+			if (batchRes.success && batchRes.results.length > 0) {
+				const item = batchRes.results[0];
+				return {
+					topic: item.topic,
+					context: item.context,
+					tone: item.tone,
+					tags: item.tags,
+					confidence: 0.98
+				};
+			}
+		} catch (err) {
+			console.warn('Gemini single classification failed, using heuristic fallback:', err);
+		}
+	}
+
+	// 2. Heuristic phân loại sơ bộ 0ms dự phòng khi không có mạng hoặc chưa truyền API key
 	const lowerMeaning = request.meaning.toLowerCase();
 	let topic: CanonicalTopic = 'general';
 	let context: CanonicalContext = 'general';
@@ -74,13 +99,16 @@ export async function classifyWordWithAI(request: ClassificationRequest): Promis
 		context = 'school';
 	} else if (lowerMeaning.includes('mèo') || lowerMeaning.includes('chó') || lowerMeaning.includes('hoa') || lowerMeaning.includes('cây')) {
 		topic = 'nature_weather';
-		context = 'home';
+		context = 'general';
 	} else if (lowerMeaning.includes('đi') || lowerMeaning.includes('đến') || lowerMeaning.includes('xe') || lowerMeaning.includes('tàu')) {
 		topic = 'transport';
 		context = 'station';
 	} else if (lowerMeaning.includes('việc') || lowerMeaning.includes('công ty') || lowerMeaning.includes('họp')) {
 		topic = 'work_business';
 		context = 'office';
+	} else if (lowerMeaning.includes('khám') || lowerMeaning.includes('bệnh') || lowerMeaning.includes('thuốc') || lowerMeaning.includes('viện')) {
+		topic = 'health_body';
+		context = 'hospital';
 	}
 
 	const tags = [
@@ -94,6 +122,6 @@ export async function classifyWordWithAI(request: ClassificationRequest): Promis
 		context: normalizeContext(context),
 		tone,
 		tags,
-		confidence: 0.9
+		confidence: 0.85
 	};
 }

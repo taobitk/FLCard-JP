@@ -6,6 +6,8 @@
 	import CreateCardModal from '$lib/features/deck-manager/components/CreateCardModal.svelte';
 	import DeckListModal from '$lib/features/deck-manager/components/DeckListModal.svelte';
 	import BatchImportModal from '$lib/features/deck-manager/components/BatchImportModal.svelte';
+	import { tagQueue } from '$lib/features/taxonomy/services/tag-queue';
+	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -14,6 +16,13 @@
 	// Đồng bộ trực tiếp dữ liệu thẻ từ Cloudflare D1
 	$effect(() => {
 		cards = data?.cards ? [...data.cards] : [];
+	});
+
+	onMount(() => {
+		const unsubscribe = tagQueue.subscribe((cardId, newTags) => {
+			cards = cards.map(c => c.id === cardId ? { ...c, tags: newTags } : c);
+		});
+		return unsubscribe;
 	});
 
 	let currentIndex = $state(0);
@@ -126,6 +135,17 @@
 			cards = [savedCard, ...cards];
 			currentIndex = 0;
 			showNotification(`🎉 Đã thêm thành công thẻ: "${savedCard.term}"!`);
+
+			// Nếu thẻ chưa có tag, đưa vào hàng đợi AI 30s
+			if (!savedCard.tags || savedCard.tags.length === 0) {
+				tagQueue.enqueue({
+					id: savedCard.id,
+					term: savedCard.term,
+					meaning: savedCard.meaning,
+					reading: savedCard.reading,
+					cardType: savedCard.type
+				});
+			}
 		}
 		isFlipped = false;
 
@@ -144,6 +164,18 @@
 		cards = [...newCards, ...cards];
 		currentIndex = 0;
 		isFlipped = false;
+
+		// Phân loại ngay các thẻ chưa có tag
+		const needTags = newCards.filter(c => !c.tags || c.tags.length === 0);
+		if (needTags.length > 0) {
+			tagQueue.classifyImmediately(needTags.map(c => ({
+				id: c.id,
+				term: c.term,
+				meaning: c.meaning,
+				reading: c.reading,
+				cardType: c.type
+			})));
+		}
 
 		try {
 			await fetch('/api/cards/batch', {

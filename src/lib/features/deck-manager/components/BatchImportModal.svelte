@@ -5,6 +5,7 @@
 		SAMPLE_JSON_TEMPLATE, 
 		SAMPLE_AI_PROMPT 
 	} from '../utils/batch-json-validator';
+	import { tagQueue } from '$lib/features/taxonomy/services/tag-queue';
 
 	interface Props {
 		isOpen: boolean;
@@ -176,6 +177,30 @@
 					} catch (e) {
 						console.warn('Lỗi khi tải ảnh lên R2:', e);
 					}
+				}
+			}
+
+			// Tự động phân loại tag cho các thẻ chưa có tag trước khi lưu
+			const untaggedCards = parsedCards.filter(c => !c.tags || c.tags.length === 0);
+			if (untaggedCards.length > 0) {
+				try {
+					const classified = await tagQueue.classifyImmediately(
+						untaggedCards.map(c => ({
+							id: c.id,
+							term: c.term,
+							meaning: c.meaning,
+							reading: c.reading,
+							cardType: c.type
+						}))
+					);
+					for (const item of classified) {
+						const card = parsedCards.find(c => c.id === item.id);
+						if (card) {
+							card.tags = item.tags;
+						}
+					}
+				} catch (tagErr) {
+					console.warn('Lỗi phân loại batch tag khi import:', tagErr);
 				}
 			}
 
