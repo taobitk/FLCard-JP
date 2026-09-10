@@ -265,7 +265,6 @@ YÊU CẦU CẤU TRÚC JSON (Mỗi phần tử đại diện 1 thẻ flashcard):
 
 Quy tắc xuất kết quả:
 - Xuất DUY NHẤT một mảng JSON nguyên bản [ { ... } ].
-- Tuyệt đối KHÔNG bọc trong markdown \`\`\`json và KHÔNG kèm văn bản giải thích nào khác.
 
 Cấu trúc mẫu tham khảo:
 ${SAMPLE_JSON_TEMPLATE}`;
