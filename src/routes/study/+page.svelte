@@ -245,35 +245,24 @@
 	{/if}
 
 	<!-- KHU VỰC TRUNG TÂM DUY NHẤT: THẺ HỌC FLASHCARD (Không cuộn, vừa khít màn hình) -->
-	<main class="flex-1 w-full max-w-lg mx-auto px-3 sm:px-4 py-1 sm:py-3 flex flex-col items-center justify-center relative z-10">
-		<!-- Thanh điều hướng thẻ tinh tế & nút quay lại Hub -->
-		<div class="w-full flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 px-1 sm:px-2">
-			<div class="flex items-center gap-1.5">
-				<a 
-					href="/"
-					class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1.5 shadow-2xs font-semibold"
-					title="Quay lại Dashboard Hub"
-				>
-					<span>🏠</span>
-					<span>Hub</span>
-				</a>
+	<main class="flex-1 w-full max-w-lg mx-auto px-3 sm:px-4 py-1 sm:py-2 flex flex-col items-center justify-center relative z-10">
+		<!-- Top Control Bar chuẩn Quizlet: Hub Link, Progress Bar + Chỉ số, Nút Trộn -->
+		<div class="w-full flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 px-1">
+			<!-- Góc trái: Quay lại Hub -->
+			<a 
+				href="/"
+				class="h-9 px-3 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all flex items-center gap-1.5 shadow-2xs font-semibold"
+				title="Quay lại Hub"
+			>
+				<span>🏠</span>
+				<span class="hidden sm:inline">Hub</span>
+			</a>
 
-				<button 
-					type="button"
-					class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 font-semibold"
-					onclick={prevCard}
-					title="Thẻ trước (Phím ←)"
-				>
-					<span>←</span>
-					<span class="hidden sm:inline">Trước</span>
-				</button>
-			</div>
-
-			<!-- Bấm vào số thứ tự để mở ngay Popup Danh Sách Thẻ -->
-			<div class="flex items-center gap-1.5 sm:gap-2">
+			<!-- Trung tâm: Chỉ số thẻ + Thanh Progress Bar -->
+			<div class="flex flex-col items-center gap-1">
 				<button
 					type="button"
-					class="font-mono text-xs px-3.5 py-1 rounded-xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs font-bold"
+					class="font-mono text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 transition-colors cursor-pointer px-2 py-0.5 rounded-lg hover:bg-slate-100 dark:hover:bg-[#1e293b]"
 					onclick={() => isDeckListModalOpen = true}
 					title="Bấm để xem danh sách toàn bộ thẻ"
 				>
@@ -283,27 +272,25 @@
 					<span class="text-[9px] text-slate-400">▼</span>
 				</button>
 
-				<!-- Nút Trộn Thẻ Ngẫu Nhiên (Shuffle Mode) -->
-				<button
-					type="button"
-					id="btn-shuffle-deck"
-					class="px-3 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 {isShuffled ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 font-bold' : 'bg-white dark:bg-[#151c2c] border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-300 hover:text-amber-500'}"
-					onclick={toggleShuffle}
-					title={isShuffled ? 'Đang bật trộn ngẫu nhiên. Bấm để khôi phục thứ tự gốc (Phím S)' : 'Trộn ngẫu nhiên thứ tự các thẻ (Phím S)'}
-				>
-					<span>🔀</span>
-					<span class="hidden sm:inline">{isShuffled ? 'Đang trộn' : 'Trộn'}</span>
-				</button>
+				<!-- Thanh Progress Bar mảnh tinh tế -->
+				<div class="w-28 sm:w-40 h-1.5 bg-slate-200 dark:bg-[#1e293b] rounded-full overflow-hidden">
+					<div 
+						class="h-full bg-indigo-500 dark:bg-indigo-400 rounded-full transition-all duration-300 ease-out"
+						style="width: {cards.length ? ((currentIndex + 1) / cards.length * 100) : 0}%"
+					></div>
+				</div>
 			</div>
 
-			<button 
+			<!-- Góc phải: Nút Trộn Thẻ Ngẫu Nhiên (Shuffle Mode) -->
+			<button
 				type="button"
-				class="px-3 py-1 rounded-xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 font-semibold"
-				onclick={nextCard}
-				title="Thẻ tiếp theo (Phím →)"
+				id="btn-shuffle-deck"
+				class="h-9 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95 {isShuffled ? 'bg-amber-500/20 border-amber-500/50 text-amber-600 dark:text-amber-400 font-bold' : 'bg-white dark:bg-[#151c2c] border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-300 hover:text-amber-500'}"
+				onclick={toggleShuffle}
+				title={isShuffled ? 'Đang bật trộn ngẫu nhiên. Bấm để khôi phục thứ tự gốc (Phím S)' : 'Trộn ngẫu nhiên thứ tự các thẻ (Phím S)'}
 			>
-				<span class="hidden sm:inline">Tiếp</span>
-				<span>→</span>
+				<span>🔀</span>
+				<span class="hidden sm:inline">{isShuffled ? 'Đang trộn' : 'Trộn'}</span>
 			</button>
 		</div>
 
@@ -324,55 +311,95 @@
 			</div>
 		{/if}
 
-		<!-- Thanh Nút Đánh Giá SRS Khi Lật Thẻ -->
-		<div class="w-full mt-2 sm:mt-4">
+		<!-- Khu Vực Điều Khiển Dưới Chân Thẻ -->
+		<div class="w-full max-w-[420px] sm:max-w-[460px] mt-2.5 sm:mt-3">
 			{#if isFlipped}
-				<div class="grid grid-cols-4 gap-1.5 sm:gap-2 animate-in fade-in slide-in-from-top-2 duration-150">
-					<button
+				<!-- Khi đã lật: 4 Nút đánh giá SRS kèm nút chuyển thẻ tiện tay -->
+				<div class="w-full flex items-center justify-between gap-1.5 sm:gap-2 animate-in fade-in slide-in-from-top-2 duration-150">
+					<button 
 						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-red-500/10 dark:bg-red-500/15 hover:bg-red-500/20 border border-red-500/30 text-red-600 dark:text-red-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Again')}
+						class="w-10 sm:w-11 h-11 sm:h-12 rounded-xl sm:rounded-2xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center justify-center shadow-2xs active:scale-95 text-base font-bold flex-shrink-0"
+						onclick={prevCard}
+						title="Thẻ trước (Phím ←)"
 					>
-						<span class="text-[11px] sm:text-xs">1. Quên</span>
-						<span class="text-[9px] sm:text-[10px] text-red-400/80 font-normal mt-0.5">&lt; 10m</span>
+						<span>←</span>
 					</button>
 
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 hover:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Hard')}
-					>
-						<span class="text-[11px] sm:text-xs">2. Khó</span>
-						<span class="text-[9px] sm:text-[10px] text-amber-400/80 font-normal mt-0.5">1 ngày</span>
-					</button>
+					<div class="grid grid-cols-4 gap-1.5 sm:gap-2 flex-1">
+						<button
+							type="button"
+							class="flex flex-col items-center justify-center h-11 sm:h-12 py-1 px-0.5 rounded-xl sm:rounded-2xl bg-red-500/10 dark:bg-red-500/15 hover:bg-red-500/20 border border-red-500/30 text-red-600 dark:text-red-300 font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+							onclick={() => handleRating('Again')}
+						>
+							<span class="text-[11px] sm:text-xs">1. Quên</span>
+							<span class="text-[9px] text-red-400/80 font-normal">&lt; 10m</span>
+						</button>
 
-					<button
-						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Good')}
-					>
-						<span class="text-[11px] sm:text-xs">3. Thuộc</span>
-						<span class="text-[9px] sm:text-[10px] text-blue-400/80 font-normal mt-0.5">3 ngày</span>
-					</button>
+						<button
+							type="button"
+							class="flex flex-col items-center justify-center h-11 sm:h-12 py-1 px-0.5 rounded-xl sm:rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 hover:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-300 font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+							onclick={() => handleRating('Hard')}
+						>
+							<span class="text-[11px] sm:text-xs">2. Khó</span>
+							<span class="text-[9px] text-amber-400/80 font-normal">1 ngày</span>
+						</button>
 
-					<button
+						<button
+							type="button"
+							class="flex flex-col items-center justify-center h-11 sm:h-12 py-1 px-0.5 rounded-xl sm:rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+							onclick={() => handleRating('Good')}
+						>
+							<span class="text-[11px] sm:text-xs">3. Thuộc</span>
+							<span class="text-[9px] text-blue-400/80 font-normal">3 ngày</span>
+						</button>
+
+						<button
+							type="button"
+							class="flex flex-col items-center justify-center h-11 sm:h-12 py-1 px-0.5 rounded-xl sm:rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 font-bold transition-all cursor-pointer active:scale-95 shadow-2xs"
+							onclick={() => handleRating('Easy')}
+						>
+							<span class="text-[11px] sm:text-xs">4. Dễ</span>
+							<span class="text-[9px] text-emerald-400/80 font-normal">5 ngày</span>
+						</button>
+					</div>
+
+					<button 
 						type="button"
-						class="flex flex-col items-center py-2 sm:py-2.5 px-0.5 sm:px-1 rounded-xl sm:rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 font-bold transition-all cursor-pointer active:scale-95 shadow-xs"
-						onclick={() => handleRating('Easy')}
+						class="w-10 sm:w-11 h-11 sm:h-12 rounded-xl sm:rounded-2xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center justify-center shadow-2xs active:scale-95 text-base font-bold flex-shrink-0"
+						onclick={nextCard}
+						title="Thẻ tiếp theo (Phím →)"
 					>
-						<span class="text-[11px] sm:text-xs">4. Dễ</span>
-						<span class="text-[9px] sm:text-[10px] text-emerald-400/80 font-normal mt-0.5">5 ngày</span>
+						<span>→</span>
 					</button>
 				</div>
 			{:else}
-				<div class="hidden sm:block text-center py-1">
+				<!-- Khi chưa lật: 3 Nút điều hướng rõ ràng (Trước • Lật xem đáp án • Tiếp) -->
+				<div class="w-full flex items-center justify-center gap-3 animate-in fade-in duration-150">
+					<button 
+						type="button"
+						class="w-11 sm:w-12 h-11 sm:h-12 rounded-2xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center justify-center shadow-2xs active:scale-95 text-lg font-bold"
+						onclick={prevCard}
+						title="Thẻ trước (Phím ←)"
+					>
+						<span>←</span>
+					</button>
+
 					<button
 						type="button"
-						class="px-4 sm:px-5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-2xs active:scale-98"
+						class="flex-1 max-w-[220px] h-11 sm:h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
 						onclick={toggleFlip}
 					>
-						<span>Chạm thẻ để xem đáp án</span>
-						<span> (hoặc <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-indigo-500 dark:text-indigo-400 border border-slate-300 dark:border-slate-700 rounded font-mono font-bold text-[10px]">Space</kbd>)</span>
+						<span>Lật xem đáp án</span>
+						<kbd class="hidden sm:inline-block px-1.5 py-0.5 bg-indigo-500/50 border border-indigo-400/40 rounded text-[10px] font-mono">Space</kbd>
+					</button>
+
+					<button 
+						type="button"
+						class="w-11 sm:w-12 h-11 sm:h-12 rounded-2xl bg-white dark:bg-[#151c2c] hover:bg-slate-50 dark:hover:bg-[#1e293b] border border-slate-200/90 dark:border-[#242f47] text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer flex items-center justify-center shadow-2xs active:scale-95 text-lg font-bold"
+						onclick={nextCard}
+						title="Thẻ tiếp theo (Phím →)"
+					>
+						<span>→</span>
 					</button>
 				</div>
 			{/if}
@@ -380,8 +407,8 @@
 	</main>
 
 	<!-- Footer -->
-	<footer class="hidden sm:block w-full py-1.5 sm:py-2 text-center text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 relative z-10">
-		FLCard-JP • Phím tắt: <kbd class="font-mono text-[10px]">Space</kbd> Lật • <kbd class="font-mono text-[10px]">← / →</kbd> Chuyển • <kbd class="font-mono text-[10px]">S</kbd> Trộn • <kbd class="font-mono text-[10px]">R</kbd> Bốc ngẫu nhiên • <kbd class="font-mono text-[10px]">1-4</kbd> Đánh giá
+	<footer class="hidden sm:block w-full py-1.5 text-center text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 relative z-10 select-none">
+		FLCard-JP • Space: Lật • ← / →: Chuyển • 1-4: Đánh giá • S: Trộn • R: Ngẫu nhiên
 	</footer>
 
 	<!-- Modals -->

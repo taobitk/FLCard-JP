@@ -36,13 +36,13 @@
 
 <button
 	type="button"
-	class="inline-flex items-center justify-center rounded-full transition-all duration-200 border border-zinc-700/60 bg-zinc-800/80 hover:bg-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white shadow-sm active:scale-95 cursor-pointer {size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-base'}"
+	class="inline-flex items-center justify-center rounded-full transition-all duration-200 border border-slate-200 dark:border-[#2e3c59] bg-slate-100 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-[#28354f] text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-2xs active:scale-95 cursor-pointer {size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-base'}"
 	onclick={playAudio}
 	{title}
 	aria-label={title}
 >
 	{#if isPlaying}
-		<span class="animate-pulse text-emerald-400">🔊</span>
+		<span class="animate-pulse text-emerald-500 dark:text-emerald-400">🔊</span>
 	{:else}
 		<span>🔊</span>
 	{/if}

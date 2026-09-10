@@ -42,7 +42,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	class="flip-scene card-perspective-container w-full max-w-[360px] sm:max-w-[420px] mx-auto aspect-[3/4] max-h-[min(540px,65dvh)] min-h-[380px] sm:min-h-[440px]"
+	class="flip-scene card-perspective-container w-full max-w-[400px] sm:max-w-[460px] mx-auto aspect-[4/5] sm:aspect-[4/3] max-h-[min(480px,58dvh)] min-h-[340px] sm:min-h-[380px]"
 	onclick={handleClick}
 	onkeydown={handleKeydown}
 	role={interactive ? 'button' : 'region'}
@@ -51,8 +51,8 @@
 >
 	<div class="flashcard card-inner-3d {isFlipped ? 'flipped' : ''}">
 		<!-- Mặt trước (Front) -->
-		<div class="card-face front front-face flex flex-col justify-between p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-lg dark:shadow-2xl relative overflow-hidden transition-colors duration-200">
-			<!-- Header mặt trước: Badge Cấp độ + Audio Button -->
+		<div class="card-face front front-face flex flex-col justify-between p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xl dark:shadow-2xl relative overflow-hidden transition-colors duration-200">
+			<!-- Header mặt trước: Badge Cấp độ + Type + Audio Button -->
 			<div class="flex items-center justify-between w-full z-10">
 				<span class="level-pill text-xs font-bold px-3 py-1 rounded-full border shadow-2xs {levelBadgeClasses[card.level] || levelBadgeClasses.N5}">
 					{card.level}
@@ -65,10 +65,10 @@
 				<AudioButton text={card.reading || card.term} size="sm" />
 			</div>
 
-			<!-- Thân giữa mặt trước: Ảnh TO NỔI BẬT 1:1 + Chữ Kanji/Furigana + Romaji -->
+			<!-- Thân giữa mặt trước: Ảnh TO NỔI BẬT 1:1 (nếu có) + Chữ Kanji/Furigana + Romaji -->
 			<div class="flex flex-col items-center justify-center flex-1 my-auto text-center z-10">
 				{#if card.imageUrl}
-					<div class="w-48 h-48 sm:w-56 sm:h-56 aspect-square rounded-2xl overflow-hidden mb-3 border border-slate-200 dark:border-[#242f47] shadow-md bg-slate-50 dark:bg-[#0b0f19] flex-shrink-0">
+					<div class="w-36 h-36 sm:w-44 sm:h-44 aspect-square rounded-2xl overflow-hidden mb-2 sm:mb-3 border border-slate-200 dark:border-[#242f47] shadow-sm bg-slate-50 dark:bg-[#0b0f19] flex-shrink-0">
 						<img 
 							src={card.imageUrl} 
 							alt={card.term} 
@@ -86,12 +86,18 @@
 					{card.romaji || card.reading}
 				</div>
 			</div>
+
+			<!-- Chân mặt trước: Gợi ý thao tác nhẹ nhàng -->
+			<div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500 font-medium z-10 select-none">
+				<span>🔄</span>
+				<span>Chạm thẻ để lật</span>
+			</div>
 		</div>
 
 		<!-- Mặt sau (Back) -->
-		<div class="card-face back back-face flex flex-col justify-between p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-lg dark:shadow-2xl relative overflow-hidden transition-colors duration-200">
+		<div class="card-face back back-face flex flex-col justify-between p-5 sm:p-7 rounded-3xl bg-white dark:bg-[#151c2c] border border-slate-200/90 dark:border-[#242f47] shadow-xl dark:shadow-2xl relative overflow-hidden transition-colors duration-200">
 			<!-- Header mặt sau -->
-			<div class="flex items-center justify-between w-full border-b border-slate-100 dark:border-[#1e293b] pb-3 z-10">
+			<div class="flex items-center justify-between w-full border-b border-slate-100 dark:border-[#1e293b] pb-2.5 z-10">
 				<div class="flex items-center gap-2">
 					<RubyText rubyHtml={card.rubyHtml} fallbackText={card.term} size="sm" />
 					<span class="text-xs text-slate-500 dark:text-slate-400 font-mono">({card.reading})</span>
@@ -100,16 +106,16 @@
 			</div>
 
 			<!-- Thân giữa mặt sau: Nghĩa tiếng Việt & Câu ví dụ -->
-			<div class="flex flex-col items-center justify-center flex-1 my-auto text-center z-10 py-2">
-				<div class="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">
+			<div class="flex flex-col items-center justify-center flex-1 my-auto text-center z-10 py-1.5 sm:py-2">
+				<div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-1">
 					Ý NGHĨA
 				</div>
-				<h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-4 px-2">
+				<h3 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mb-3 sm:mb-4 px-2 tracking-tight">
 					{card.meaning}
 				</h3>
 
 				{#if card.example}
-					<div class="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200/80 dark:border-[#242f47] rounded-2xl p-4 text-left text-xs sm:text-sm space-y-1.5 shadow-2xs">
+					<div class="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200/80 dark:border-[#242f47] rounded-2xl p-3 sm:p-4 text-left text-xs sm:text-sm space-y-1 shadow-2xs">
 						<div class="text-slate-900 dark:text-slate-200 font-jp font-medium">
 							{#if card.example.rubyHtml}
 								{@html card.example.rubyHtml}
@@ -117,11 +123,17 @@
 								{card.example.japanese}
 							{/if}
 						</div>
-						<div class="text-slate-500 dark:text-slate-400 text-xs italic">
+						<div class="text-slate-500 dark:text-slate-400 text-xs italic font-sans">
 							{card.example.vietnamese}
 						</div>
 					</div>
 				{/if}
+			</div>
+
+			<!-- Chân mặt sau: Gợi ý quay lại -->
+			<div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 dark:text-slate-500 font-medium z-10 select-none">
+				<span>🔄</span>
+				<span>Chạm để lật lại mặt trước</span>
 			</div>
 		</div>
 	</div>
