@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { FlashcardItem } from '$lib/features/flashcard/types';
+	import { formatDisplayTag } from '$lib/features/taxonomy/normalizer';
 
 	interface Props {
 		isOpen: boolean;
@@ -30,12 +31,17 @@
 		cards.map((card, originalIdx) => ({ card, originalIdx })).filter(({ card }) => {
 			const q = searchQuery.trim().toLowerCase();
 			if (!q) return true;
-			return (
+			const matchesBasic = (
 				card.term.toLowerCase().includes(q) ||
 				card.reading.toLowerCase().includes(q) ||
 				card.meaning.toLowerCase().includes(q) ||
 				card.level.toLowerCase().includes(q)
 			);
+			const matchesTag = (card.tags || []).some(t => {
+				const info = formatDisplayTag(t);
+				return t.toLowerCase().includes(q) || info.label.toLowerCase().includes(q);
+			});
+			return matchesBasic || matchesTag;
 		})
 	);
 </script>
@@ -136,6 +142,17 @@
 									<div class="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
 										{item.card.meaning}
 									</div>
+									{#if item.card.tags && item.card.tags.length > 0}
+										<div class="flex flex-wrap gap-1 mt-1">
+											{#each item.card.tags as tag}
+												{@const info = formatDisplayTag(tag)}
+												<span class="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50">
+													<span>{info.icon}</span>
+													<span>{info.label}</span>
+												</span>
+											{/each}
+										</div>
+									{/if}
 								</div>
 							</div>
 

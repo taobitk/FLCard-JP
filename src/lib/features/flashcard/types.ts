@@ -31,5 +31,6 @@ export interface FlashcardItem {
 	type?: CardType;       // Từ loại
 	imageUrl?: string;     // URL ảnh hoặc data:image Base64
 	example?: ExampleSentence; // Câu ví dụ minh họa
+	tags?: string[];       // Danh sách tag chuẩn hóa (ví dụ: ['where:restaurant', 'topic:food_drink'])
 	createdAt: number;     // Timestamp tạo thẻ
 }

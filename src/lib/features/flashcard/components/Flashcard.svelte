@@ -2,6 +2,7 @@
 	import type { FlashcardItem } from '../types';
 	import RubyText from './RubyText.svelte';
 	import AudioButton from './AudioButton.svelte';
+	import { formatDisplayTag } from '$lib/features/taxonomy/normalizer';
 
 	interface Props {
 		card: FlashcardItem;
@@ -126,6 +127,18 @@
 						<div class="text-slate-500 dark:text-slate-400 text-xs italic font-sans">
 							{card.example.vietnamese}
 						</div>
+					</div>
+				{/if}
+
+				{#if card.tags && card.tags.length > 0}
+					<div class="flex flex-wrap items-center justify-center gap-1.5 mt-2.5">
+						{#each card.tags as tag}
+							{@const info = formatDisplayTag(tag)}
+							<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-[#1e293b] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-[#2e3c59]">
+								<span class="text-xs">{info.icon}</span>
+								<span>{info.label}</span>
+							</span>
+						{/each}
 					</div>
 				{/if}
 			</div>

@@ -5,6 +5,18 @@
 	import { buildSmartRuby, type RomajiCorrection } from '../utils/romaji-normalizer';
 	import ImageUploader from './ImageUploader.svelte';
 	import Flashcard from '$lib/features/flashcard/components/Flashcard.svelte';
+	import { 
+		CANONICAL_TOPICS, 
+		CANONICAL_CONTEXTS, 
+		CANONICAL_TONES, 
+		TOPIC_METADATA, 
+		CONTEXT_METADATA,
+		type CanonicalTopic,
+		type CanonicalContext,
+		type CanonicalTone
+	} from '$lib/features/taxonomy/constants';
+	import { buildFacetedTag, formatDisplayTag } from '$lib/features/taxonomy/normalizer';
+	import { classifyWordWithAI } from '$lib/features/taxonomy/services/ai-classifier';
 
 	interface Props {
 		isOpen: boolean;
@@ -27,6 +39,12 @@
 	let exampleJpInput = $state('');
 	let exampleViInput = $state('');
 
+	// Tag State
+	let tagsInput = $state<string[]>([]);
+	let selectedTopic = $state<CanonicalTopic>('general');
+	let selectedContext = $state<CanonicalContext>('general');
+	let isSuggestingTags = $state(false);
+
 	// Điền form khi mở modal ở chế độ chỉnh sửa
 	$effect(() => {
 		if (isOpen) {
@@ -41,6 +59,14 @@
 				imageUrlInput = cardToEdit.imageUrl || '';
 				exampleJpInput = cardToEdit.example?.japanese || '';
 				exampleViInput = cardToEdit.example?.vietnamese || '';
+				
+				const currentTags = cardToEdit.tags ? [...cardToEdit.tags] : [];
+				tagsInput = currentTags;
+
+				const tTag = currentTags.find(t => t.startsWith('topic:'));
+				selectedTopic = tTag ? (tTag.replace('topic:', '') as CanonicalTopic) : 'general';
+				const cTag = currentTags.find(t => t.startsWith('where:'));
+				selectedContext = cTag ? (cTag.replace('where:', '') as CanonicalContext) : 'general';
 			} else {
 				resetForm();
 			}
@@ -119,6 +145,50 @@
 		correction = null;
 	}
 
+	// Gợi ý thẻ Tag tự động
+	async function handleAutoTag() {
+		const term = termInput.trim() || autoHiragana.trim();
+		const meaning = meaningInput.trim();
+		if (!meaning && !term) {
+			alert('Vui lòng nhập nghĩa tiếng Việt hoặc từ tiếng Nhật để gợi ý tag!');
+			return;
+		}
+
+		isSuggestingTags = true;
+		try {
+			const res = await classifyWordWithAI({
+				term: term || '言葉',
+				meaning: meaning || 'từ vựng',
+				reading: readingInput.trim() || autoHiragana.trim(),
+				cardType: typeInput
+			});
+
+			selectedTopic = res.topic;
+			selectedContext = res.context;
+			tagsInput = res.tags;
+		} catch (err) {
+			console.error('Lỗi gợi ý tag:', err);
+		} finally {
+			isSuggestingTags = false;
+		}
+	}
+
+	function handleRemoveTag(tag: string) {
+		tagsInput = tagsInput.filter(t => t !== tag);
+	}
+
+	function handleTopicChange(newTopic: CanonicalTopic) {
+		selectedTopic = newTopic;
+		const newTag = buildFacetedTag('topic', newTopic);
+		tagsInput = [...tagsInput.filter(t => !t.startsWith('topic:')), newTag];
+	}
+
+	function handleContextChange(newContext: CanonicalContext) {
+		selectedContext = newContext;
+		const newTag = buildFacetedTag('where', newContext);
+		tagsInput = [...tagsInput.filter(t => !t.startsWith('where:')), newTag];
+	}
+
 	// Tạo đối tượng thẻ xem trước thời gian thực
 	let previewCard = $derived<FlashcardItem>({
 		id: 'preview-card',
@@ -134,6 +204,7 @@
 			japanese: exampleJpInput,
 			vietnamese: exampleViInput || 'Câu ví dụ minh họa'
 		} : undefined,
+		tags: tagsInput,
 		createdAt: Date.now()
 	});
 
@@ -173,6 +244,7 @@
 				japanese: exampleJpInput.trim(),
 				vietnamese: exampleViInput.trim()
 			} : undefined,
+			tags: tagsInput,
 			createdAt: cardToEdit?.createdAt || Date.now()
 		};
 
@@ -192,6 +264,9 @@
 		imageUrlInput = '';
 		exampleJpInput = '';
 		exampleViInput = '';
+		tagsInput = [];
+		selectedTopic = 'general';
+		selectedContext = 'general';
 		previewFlipped = false;
 	}
 </script>
@@ -398,6 +473,81 @@
 								<option value="Cụm từ">Cụm từ</option>
 							</select>
 						</div>
+					</div>
+
+					<!-- 7. Gắn Thẻ Tag Phân Loại Chủ Đề & Bối Cảnh (Taxonomy) -->
+					<div class="p-3.5 bg-zinc-50 dark:bg-zinc-950/80 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3">
+						<div class="flex items-center justify-between">
+							<div class="text-xs font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+								<span>🏷️ Phân loại chủ đề (Tags)</span>
+							</div>
+							<button
+								type="button"
+								class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-400 border border-rose-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 disabled:opacity-50"
+								onclick={handleAutoTag}
+								disabled={isSuggestingTags}
+							>
+								<span>{isSuggestingTags ? '⏳ Đang gợi ý...' : '✨ Gợi ý tag AI'}</span>
+							</button>
+						</div>
+
+						<!-- Chọn Chủ đề & Nơi chốn -->
+						<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+							<div>
+								<label for="topic-select" class="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+									Chủ đề đời sống (Topic)
+								</label>
+								<select
+									id="topic-select"
+									class="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs focus:outline-none focus:border-rose-500 cursor-pointer"
+									value={selectedTopic}
+									onchange={(e) => handleTopicChange(e.currentTarget.value as CanonicalTopic)}
+								>
+									{#each CANONICAL_TOPICS as top}
+										{@const meta = TOPIC_METADATA[top]}
+										<option value={top}>{meta.icon} {meta.label}</option>
+									{/each}
+								</select>
+							</div>
+
+							<div>
+								<label for="context-select" class="block text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+									Bối cảnh sử dụng (Context)
+								</label>
+								<select
+									id="context-select"
+									class="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white text-xs focus:outline-none focus:border-rose-500 cursor-pointer"
+									value={selectedContext}
+									onchange={(e) => handleContextChange(e.currentTarget.value as CanonicalContext)}
+								>
+									{#each CANONICAL_CONTEXTS as ctx}
+										{@const meta = CONTEXT_METADATA[ctx]}
+										<option value={ctx}>{meta.icon} {meta.label}</option>
+									{/each}
+								</select>
+							</div>
+						</div>
+
+						<!-- Danh sách các thẻ tag đang gắn -->
+						{#if tagsInput.length > 0}
+							<div class="flex flex-wrap gap-1.5 pt-1">
+								{#each tagsInput as tag}
+									{@const info = formatDisplayTag(tag)}
+									<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-250 dark:border-zinc-700 shadow-2xs">
+										<span>{info.icon}</span>
+										<span>{info.label}</span>
+										<button
+											type="button"
+											class="text-zinc-400 hover:text-rose-500 ml-0.5 cursor-pointer"
+											onclick={() => handleRemoveTag(tag)}
+											title="Gỡ tag này"
+										>
+											✕
+										</button>
+									</span>
+								{/each}
+							</div>
+						{/if}
 					</div>
 
 					<!-- Nút Submit -->

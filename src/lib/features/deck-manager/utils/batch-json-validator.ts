@@ -1,6 +1,7 @@
 import type { FlashcardItem, JLPTLevel, CardType } from '$lib/features/flashcard/types';
 import { toRomaji } from './romaji-to-kana';
 import { buildSmartRuby } from './romaji-normalizer';
+import { buildFacetedTag } from '$lib/features/taxonomy/normalizer';
 
 const VALID_LEVELS: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
@@ -142,6 +143,18 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 				}
 			}
 
+			let tags: string[] | undefined = undefined;
+			if (Array.isArray(item.tags)) {
+				tags = item.tags.map((t: any) => {
+					const str = String(t).trim();
+					if (str.startsWith('topic:') || str.startsWith('where:') || str.startsWith('tone:')) {
+						const [facet, val] = str.split(':');
+						return buildFacetedTag(facet as any, val);
+					}
+					return buildFacetedTag('topic', str);
+				});
+			}
+
 			validatedCards.push({
 				id: item.id ? String(item.id) : `card-${Date.now()}-${itemNum}-${Math.random().toString(36).slice(2, 6)}`,
 				term,
@@ -153,6 +166,7 @@ export function validateBatchJson(jsonText: string): ValidationResult {
 				type,
 				imageUrl: item.imageUrl ? String(item.imageUrl) : undefined,
 				example,
+				tags,
 				createdAt: Date.now() + index
 			});
 		}

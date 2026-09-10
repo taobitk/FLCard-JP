@@ -1,21 +1,26 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getAllCards, createCard, updateCard, deleteCard } from '$lib/server/db/cards';
+import { getAllCards, getCardsByTag, createCard, updateCard, deleteCard } from '$lib/server/db/cards';
 import type { FlashcardItem } from '$lib/features/flashcard/types';
 
 /**
  * GET /api/cards
- * Lấy danh sách toàn bộ thẻ từ Cloudflare D1
+ * Lấy danh sách toàn bộ thẻ từ Cloudflare D1 (có thể lọc theo ?tag=xxx)
  */
-export const GET: RequestHandler = async ({ platform }) => {
+export const GET: RequestHandler = async ({ url, platform }) => {
 	if (!platform?.env?.DB) {
 		return json({ error: 'Cloudflare D1 Database binding (DB) is not available' }, { status: 500 });
 	}
 
 	try {
-		const cards = await getAllCards(platform.env.DB);
+		const tag = url.searchParams.get('tag');
+		const cards = tag
+			? await getCardsByTag(platform.env.DB, tag)
+			: await getAllCards(platform.env.DB);
+
 		return json({
 			count: cards.length,
+			tagFilter: tag || null,
 			cards
 		}, {
 			headers: {
