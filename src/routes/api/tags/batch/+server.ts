@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { classifyBatchWithGemini, type BatchClassificationItem } from '$lib/features/taxonomy/services/gemini-classifier';
+import { classifyWordWithAI } from '$lib/features/taxonomy/services/ai-classifier';
 
 /**
  * POST /api/tags/batch
@@ -26,20 +27,38 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		}
 
 		// Gọi Gemini với cơ chế Failover Chain
-		const batchResult = await classifyBatchWithGemini(cards, apiKey);
+		let batchResult = await classifyBatchWithGemini(cards, apiKey);
+		let finalResults = batchResult.results;
+		let modelUsed = batchResult.modelUsed;
 
-		if (!batchResult.success) {
-			return json({
-				error: 'Lỗi phân loại lô từ vựng từ AI Studio',
-				details: batchResult.error
-			}, { status: 502 });
+		// Graceful Fallback: Nếu Gemini gặp sự cố (ví dụ IP Cloudflare bị Google chặn location hoặc 429)
+		if (!batchResult.success || !finalResults || finalResults.length === 0) {
+			console.warn('[Tags Batch] Gemini failover failed, falling back to Heuristic classifier:', batchResult.error);
+			finalResults = await Promise.all(
+				cards.map(async (c) => {
+					const res = await classifyWordWithAI({
+						term: c.term,
+						meaning: c.meaning,
+						reading: c.reading,
+						cardType: c.cardType
+					});
+					return {
+						id: c.id,
+						topic: res.topic,
+						context: res.context,
+						tone: res.tone,
+						tags: res.tags
+					};
+				})
+			);
+			modelUsed = 'heuristic_fallback';
 		}
 
 		// Nếu có kết nối Cloudflare D1, tự động cập nhật trường tags cho từng card
-		if (platform?.env?.DB && batchResult.results.length > 0) {
+		if (platform?.env?.DB && finalResults.length > 0) {
 			try {
 				const updateSql = 'UPDATE cards SET tags = ? WHERE id = ?';
-				const stmts = batchResult.results.map((res) =>
+				const stmts = finalResults.map((res) =>
 					platform.env.DB.prepare(updateSql).bind(
 						JSON.stringify(res.tags),
 						res.id
@@ -54,9 +73,9 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 		return json({
 			success: true,
-			count: batchResult.results.length,
-			modelUsed: batchResult.modelUsed,
-			results: batchResult.results
+			count: finalResults.length,
+			modelUsed,
+			results: finalResults
 		});
 	} catch (err: any) {
 		return json({ error: 'Lỗi xử lý batch tags', details: err?.message }, { status: 500 });

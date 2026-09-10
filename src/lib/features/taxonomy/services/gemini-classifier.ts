@@ -36,9 +36,10 @@ export interface BatchClassificationResult {
  */
 export const GEMINI_FAILOVER_MODELS = [
 	'gemini-3.5-flash-lite',
-	'gemini-3.1-flash-lite',
 	'gemini-flash-lite-latest',
-	'gemini-3.6-flash'
+	'gemini-3.1-flash-lite',
+	'gemini-3.6-flash',
+	'gemini-3.7-flash'
 ] as const;
 
 /**
@@ -123,7 +124,7 @@ export async function classifyBatchWithGemini(
 			if (!response.ok) {
 				const errorText = await response.text();
 				console.warn(`[Gemini Failover] Model ${model} failed with HTTP ${response.status}:`, errorText.slice(0, 200));
-				lastError = new Error(`Model ${model} returned ${response.status}`);
+				lastError = new Error(`Model ${model} returned ${response.status}: ${errorText.slice(0, 150)}`);
 				// Thử model kế tiếp trong chuỗi
 				continue;
 			}
